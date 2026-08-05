@@ -149,7 +149,9 @@ export function CreateMonthWizard({ trigger }: { trigger: React.ReactNode }) {
                   onValueChange={(v) => setMonth(Number(v))}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue />
+                    <SelectValue>
+                      {(value: string) => MONTH_NAMES[Number(value) - 1]}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {MONTH_NAMES.map((name, index) => (
