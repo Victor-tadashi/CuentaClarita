@@ -23,7 +23,7 @@ function Brand() {
         <Wallet className="size-4" />
       </span>
       <span className="text-[0.95rem] font-semibold tracking-tight">
-        FinMes
+        CuentaClarita
       </span>
     </Link>
   )

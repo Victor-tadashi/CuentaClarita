@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'FinMes — Tus finanzas mes a mes',
+  title: 'CuentaClarita — Tus finanzas mes a mes',
   description:
     'Registra tu sueldo y tus deudas mensuales para saber exactamente cuánto dinero te queda disponible cada mes.',
   generator: 'v0.app',

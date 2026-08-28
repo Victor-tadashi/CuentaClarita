@@ -42,7 +42,7 @@ export function DashboardView() {
         <PageHeader title="Dashboard" />
         <EmptyState
           icon={Sparkles}
-          title="Bienvenido a FinMes"
+          title="Bienvenido a CuentaClarita"
           description="Todavía no has creado ningún mes. Crea tu primer mes para registrar tu sueldo y tus deudas."
           action={
             <CreateMonthWizard
