@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Toaster } from '@/components/ui/sonner'
 import { FinanceProvider } from '@/features/store/finance-provider'
+import { AuthProvider } from '@/features/auth/auth-provider'
 import { AppShell } from '@/components/layout/app-shell'
 import './globals.css'
 
@@ -41,9 +42,11 @@ export default function RootLayout({
       className={`dark ${geistSans.variable} ${geistMono.variable}`}
     >
       <body className="min-h-screen bg-background font-sans antialiased">
-        <FinanceProvider>
-          <AppShell>{children}</AppShell>
-        </FinanceProvider>
+        <AuthProvider>
+          <FinanceProvider>
+            <AppShell>{children}</AppShell>
+          </FinanceProvider>
+        </AuthProvider>
         <Toaster />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

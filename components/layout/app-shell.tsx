@@ -2,8 +2,9 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, CalendarDays, History, Wallet } from 'lucide-react'
+import { LayoutDashboard, CalendarDays, History, Wallet, LogOut, UserCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useAuth } from '@/features/auth/auth-provider'
 
 const NAV_ITEMS = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -31,6 +32,13 @@ function Brand() {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const { user, loaded, signOut } = useAuth()
+
+  if (pathname.startsWith('/login') || pathname.startsWith('/registro')) {
+    return <>{children}</>
+  }
+
+  if (!loaded || !user) return null
 
   return (
     <div className="min-h-screen md:flex">
@@ -59,9 +67,29 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             )
           })}
         </nav>
-        <p className="mt-auto px-2.5 text-xs leading-relaxed text-muted-foreground">
-          ¿Cuánto dinero te quedará este mes después de pagar tus deudas?
-        </p>
+        <div className="mt-auto flex flex-col gap-4">
+          <p className="px-2.5 text-xs leading-relaxed text-muted-foreground">
+            ¿Cuánto dinero te quedará este mes después de pagar tus deudas?
+          </p>
+          <div className="flex items-center justify-between gap-2 rounded-xl border border-border bg-card/60 p-2.5">
+            <div className="flex min-w-0 items-center gap-2">
+              <UserCircle className="size-5 shrink-0 text-primary" />
+              <div className="min-w-0">
+                <p className="truncate text-xs font-medium">{user.name}</p>
+                <p className="truncate text-[0.68rem] text-muted-foreground">{user.email}</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={signOut}
+              className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              aria-label="Cerrar sesión"
+              title="Cerrar sesión"
+            >
+              <LogOut className="size-4" />
+            </button>
+          </div>
+        </div>
       </aside>
 
       {/* Encabezado — móvil */}

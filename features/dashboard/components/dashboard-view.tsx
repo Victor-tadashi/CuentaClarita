@@ -9,6 +9,7 @@ import { PageHeader } from '@/features/shared/components/page-header'
 import { EmptyState } from '@/features/shared/components/empty-state'
 import { ConfirmDialog } from '@/features/shared/components/confirm-dialog'
 import { useFinance } from '@/features/store/finance-provider'
+import { useAuth } from '@/features/auth/auth-provider'
 import { monthLabel } from '@/features/shared/lib/format'
 import { CreateMonthWizard } from '@/features/months/components/create-month-wizard'
 import { SalaryDialog } from '@/features/months/components/salary-dialog'
@@ -18,6 +19,7 @@ import { DebtFormDialog } from '@/features/debts/components/debt-form-dialog'
 import type { Debt, DebtInput } from '@/features/debts/types'
 
 export function DashboardView() {
+  const { user } = useAuth()
   const {
     loaded,
     activeMonth,
@@ -84,7 +86,7 @@ export function DashboardView() {
     <>
       <PageHeader
         title={monthLabel(activeMonth.month, activeMonth.year)}
-        description="Este es tu mes activo."
+        description={`Hola, ${user?.name ?? 'de nuevo'}. Este es tu mes activo.`}
         action={
           <div className="flex items-center gap-2">
             <Badge variant="secondary" className="gap-1">
