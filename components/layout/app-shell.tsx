@@ -76,7 +76,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <UserCircle className="size-5 shrink-0 text-primary" />
               <div className="min-w-0">
                 <p className="truncate text-xs font-medium">{user.name}</p>
-                <p className="truncate text-[0.68rem] text-muted-foreground">{user.email}</p>
               </div>
             </div>
             <button
