@@ -18,7 +18,7 @@ export default function LoginPage() {
 
   if (!loaded || user) return null
 
-  function submit(event: React.FormEvent<HTMLFormElement>) {
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setError('')
     if (registering && name.trim().length < 2) {
@@ -29,7 +29,7 @@ export default function LoginPage() {
       setError('La contraseña debe tener al menos 6 caracteres.')
       return
     }
-    const result = registering ? signUp(name, email, password) : signIn(email, password)
+    const result = registering ? await signUp(name, email, password) : await signIn(email, password)
     if (!result.ok) setError(result.message ?? 'No pudimos completar la acción.')
   }
 
@@ -53,7 +53,7 @@ export default function LoginPage() {
             </span>
             <div>
               <h2 className="font-semibold">{registering ? 'Crear cuenta' : 'Iniciar sesión'}</h2>
-              <p className="text-xs text-muted-foreground">Acceso local preparado para migrar a Supabase.</p>
+              <p className="text-xs text-muted-foreground">Acceso seguro con Supabase.</p>
             </div>
           </div>
 
@@ -86,7 +86,7 @@ export default function LoginPage() {
           </p>
         </div>
         <p className="mt-6 text-center text-xs leading-relaxed text-muted-foreground">
-          Tus datos se guardan localmente en este dispositivo mientras conectas Supabase.
+          Tu acceso está protegido y listo para sincronizar tus finanzas.
         </p>
         <Link href="/" className="sr-only">Ir al dashboard</Link>
       </section>

@@ -1,98 +1,29 @@
 'use client'
 
+'use client'
+
 import * as React from 'react'
 import { usePathname, useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 
-type LocalUser = { id: string; name: string; email: string; password: string }
-type SessionUser = Omit<LocalUser, 'password'>
-
-type AuthContextValue = {
-  user: SessionUser | null
-  loaded: boolean
-  signIn: (email: string, password: string) => { ok: boolean; message?: string }
-  signUp: (name: string, email: string, password: string) => { ok: boolean; message?: string }
-  signOut: () => void
-}
-
-const USERS_KEY = 'cuentaclarita:users:v1'
-const SESSION_KEY = 'cuentaclarita:session:v1'
+type SessionUser = { id: string; name: string; email: string }
+type AuthContextValue = { user: SessionUser | null; loaded: boolean; signIn: (email: string, password: string) => Promise<{ ok: boolean; message?: string }>; signUp: (name: string, email: string, password: string) => Promise<{ ok: boolean; message?: string }>; signOut: () => Promise<void> }
 const AuthContext = React.createContext<AuthContextValue | null>(null)
 
-function read<T>(key: string, fallback: T): T {
-  try {
-    const value = window.localStorage.getItem(key)
-    return value ? (JSON.parse(value) as T) : fallback
-  } catch {
-    return fallback
-  }
+function mapUser(user: { id: string; email?: string; user_metadata?: { display_name?: string } }): SessionUser {
+  return { id: user.id, email: user.email ?? '', name: user.user_metadata?.display_name || user.email?.split('@')[0] || 'Usuario' }
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const [user, setUser] = React.useState<SessionUser | null>(null)
-  const [loaded, setLoaded] = React.useState(false)
-
-  React.useEffect(() => {
-    setUser(read<SessionUser | null>(SESSION_KEY, null))
-    setLoaded(true)
-  }, [])
-
-  React.useEffect(() => {
-    if (!loaded) return
-    const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/registro')
-    if (!user && !isAuthRoute) router.replace('/login')
-    if (user && isAuthRoute) router.replace('/')
-  }, [loaded, pathname, router, user])
-
-  const signIn = React.useCallback((email: string, password: string) => {
-    const normalizedEmail = email.trim().toLowerCase()
-    const found = read<LocalUser[]>(USERS_KEY, []).find(
-      (candidate) => candidate.email === normalizedEmail && candidate.password === password,
-    )
-    if (!found) return { ok: false, message: 'Correo o contraseña incorrectos.' }
-    const session = { id: found.id, name: found.name, email: found.email }
-    window.localStorage.setItem(SESSION_KEY, JSON.stringify(session))
-    setUser(session)
-    router.replace('/')
-    return { ok: true }
-  }, [router])
-
-  const signUp = React.useCallback((name: string, email: string, password: string) => {
-    const normalizedEmail = email.trim().toLowerCase()
-    const users = read<LocalUser[]>(USERS_KEY, [])
-    if (users.some((candidate) => candidate.email === normalizedEmail)) {
-      return { ok: false, message: 'Ya existe una cuenta con ese correo.' }
-    }
-    const newUser: LocalUser = {
-      id: crypto.randomUUID(),
-      name: name.trim(),
-      email: normalizedEmail,
-      password,
-    }
-    users.push(newUser)
-    window.localStorage.setItem(USERS_KEY, JSON.stringify(users))
-    const session = { id: newUser.id, name: newUser.name, email: newUser.email }
-    window.localStorage.setItem(SESSION_KEY, JSON.stringify(session))
-    setUser(session)
-    router.replace('/')
-    return { ok: true }
-  }, [router])
-
-  const signOut = React.useCallback(() => {
-    window.localStorage.removeItem(SESSION_KEY)
-    setUser(null)
-    router.replace('/login')
-  }, [router])
-
-  return <AuthContext.Provider value={{ user, loaded, signIn, signUp, signOut }}>{children}</AuthContext.Provider>
+  const router = useRouter(); const pathname = usePathname(); const supabase = React.useMemo(() => createClient(), [])
+  const [user, setUser] = React.useState<SessionUser | null>(null); const [loaded, setLoaded] = React.useState(false)
+  React.useEffect(() => { supabase.auth.getUser().then(({ data }: { data: { user: Parameters<typeof mapUser>[0] | null } }) => { setUser(data.user ? mapUser(data.user) : null); setLoaded(true) }); const { data } = supabase.auth.onAuthStateChange((_event: string, session: { user: Parameters<typeof mapUser>[0] | null } | null) => setUser(session?.user ? mapUser(session.user) : null)); return () => data.subscription.unsubscribe() }, [supabase])
+  React.useEffect(() => { if (!loaded) return; const authRoute = pathname.startsWith('/login'); if (!user && !authRoute) router.replace('/login'); if (user && authRoute) router.replace('/') }, [loaded, pathname, router, user])
+  const value = React.useMemo<AuthContextValue>(() => ({ user, loaded,
+    async signIn(email, password) { const { error } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password }); if (error) return { ok: false, message: 'Correo o contraseña incorrectos.' }; router.replace('/'); return { ok: true } },
+    async signUp(name, email, password) { const { data, error } = await supabase.auth.signUp({ email: email.trim().toLowerCase(), password, options: { data: { display_name: name.trim() }, emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ?? `${window.location.origin}/auth/callback` } }); if (error) return { ok: false, message: 'No pudimos crear la cuenta. Revisa tus datos e inténtalo nuevamente.' }; if (!data.session) return { ok: false, message: 'Revisa tu correo para confirmar tu cuenta antes de iniciar sesión.' }; router.replace('/'); return { ok: true } },
+    async signOut() { await supabase.auth.signOut(); router.replace('/login') },
+  }), [loaded, router, supabase, user])
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
-
-export function useAuth() {
-  const context = React.useContext(AuthContext)
-  if (!context) throw new Error('useAuth debe usarse dentro de AuthProvider')
-  return context
-}
-
-export const AUTH_STORAGE_KEYS = { USERS_KEY, SESSION_KEY }
-// Sustituir este provider por Supabase Auth cuando se conecte la integración.
+export function useAuth() { const context = React.useContext(AuthContext); if (!context) throw new Error('useAuth debe usarse dentro de AuthProvider'); return context }
