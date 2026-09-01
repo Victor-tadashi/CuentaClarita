@@ -55,7 +55,7 @@ export function FinanceProvider({
 }: {
   children: React.ReactNode
 }) {
-  const supabase = React.useMemo(() => createClient(), [])
+  const supabase = React.useMemo(() => typeof window === 'undefined' ? null : createClient(), [])
   const { user } = useAuth()
   const [data, setData] = React.useState<FinanceData>(EMPTY_DATA)
   const [loaded, setLoaded] = React.useState(false)
@@ -64,7 +64,7 @@ export function FinanceProvider({
   React.useEffect(() => {
     let cancelled = false
     async function loadRemote() {
-      if (!user) { setData(EMPTY_DATA); setRemoteReady(false); setLoaded(true); return }
+      if (!user || !supabase) { setData(EMPTY_DATA); setRemoteReady(false); setLoaded(true); return }
       const [{ data: remoteMonths, error: monthsError }, { data: remoteDebts, error: debtsError }] = await Promise.all([
         supabase.from('months').select('id, year, month, salary, status, created_at, updated_at').eq('user_id', user.id).order('year', { ascending: false }).order('month', { ascending: false }),
         supabase.from('debts').select('id, month_id, name, amount, due_date, notes, created_at, updated_at').eq('user_id', user.id).order('created_at'),
@@ -84,7 +84,7 @@ export function FinanceProvider({
   }, [supabase, user])
 
   React.useEffect(() => {
-    if (!loaded || !remoteReady || !user) return
+    if (!loaded || !remoteReady || !user || !supabase) return
     void syncToSupabase(data, user.id, supabase).catch((error) => {
       console.error('[v0] Error guardando finanzas en Supabase', error)
     })
