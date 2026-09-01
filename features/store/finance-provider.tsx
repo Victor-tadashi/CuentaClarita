@@ -44,10 +44,34 @@ function compareMonthsDesc(a: Month, b: Month) {
 async function syncToSupabase(data: FinanceData, userId: string, client: ReturnType<typeof createClient>) {
   const months = data.months.map((m) => ({ id: m.id, user_id: userId, year: m.year, month: m.month, salary: m.salary, status: m.status, created_at: m.createdAt, updated_at: m.updatedAt }))
   const debts = data.debts.map((d) => ({ id: d.id, month_id: d.monthId, user_id: userId, name: d.name, amount: d.amount, due_date: d.dueDate, notes: d.notes, created_at: d.createdAt, updated_at: d.updatedAt }))
-  await client.from('debts').delete().eq('user_id', userId)
-  await client.from('months').delete().eq('user_id', userId)
-  if (months.length) await client.from('months').insert(months)
-  if (debts.length) await client.from('debts').insert(debts)
+
+  // Upsert primero: un fallo nunca puede dejar la cuenta vacía.
+  if (months.length) {
+    const { error } = await client.from('months').upsert(months, { onConflict: 'id' })
+    if (error) throw error
+  }
+  if (debts.length) {
+    const { error } = await client.from('debts').upsert(debts, { onConflict: 'id' })
+    if (error) throw error
+  }
+
+  // Elimina únicamente filas que el usuario borró localmente.
+  const monthIds = months.map((month) => month.id)
+  const debtIds = debts.map((debt) => debt.id)
+  const { data: remoteMonths, error: remoteMonthsError } = await client.from('months').select('id').eq('user_id', userId)
+  if (remoteMonthsError) throw remoteMonthsError
+  const staleMonthIds = (remoteMonths ?? []).map((month) => month.id).filter((id) => !monthIds.includes(id))
+  if (staleMonthIds.length) {
+    const { error } = await client.from('months').delete().eq('user_id', userId).in('id', staleMonthIds)
+    if (error) throw error
+  }
+  const { data: remoteDebts, error: remoteDebtsError } = await client.from('debts').select('id').eq('user_id', userId)
+  if (remoteDebtsError) throw remoteDebtsError
+  const staleDebtIds = (remoteDebts ?? []).map((debt) => debt.id).filter((id) => !debtIds.includes(id))
+  if (staleDebtIds.length) {
+    const { error } = await client.from('debts').delete().eq('user_id', userId).in('id', staleDebtIds)
+    if (error) throw error
+  }
 }
 
 export function FinanceProvider({
@@ -60,6 +84,7 @@ export function FinanceProvider({
   const [data, setData] = React.useState<FinanceData>(EMPTY_DATA)
   const [loaded, setLoaded] = React.useState(false)
   const [remoteReady, setRemoteReady] = React.useState(false)
+  const syncQueue = React.useRef(Promise.resolve())
 
   React.useEffect(() => {
     let cancelled = false
@@ -85,10 +110,14 @@ export function FinanceProvider({
 
   React.useEffect(() => {
     if (!loaded || !remoteReady || !user || !supabase) return
-    void syncToSupabase(data, user.id, supabase).catch((error) => {
-      console.error('[v0] Error guardando finanzas en Supabase', error)
-    })
-  }, [data, loaded, supabase, user])
+    const snapshot = data
+    syncQueue.current = syncQueue.current
+      .catch(() => undefined)
+      .then(() => syncToSupabase(snapshot, user.id, supabase))
+      .catch((error) => {
+        console.error('[v0] Error guardando finanzas en Supabase', error)
+      })
+  }, [data, loaded, remoteReady, supabase, user])
 
   const value = React.useMemo<FinanceContextValue>(() => {
     const sortedMonths = [...data.months].sort(compareMonthsDesc)
