@@ -6,12 +6,7 @@ import { useAuth } from '@/features/auth/auth-provider'
 import type { Month, NewMonthInput } from '@/features/months/types'
 import type { Debt, DebtInput } from '@/features/debts/types'
 import { createId } from '@/features/shared/lib/format'
-import {
-  createLocalFinanceRepository,
-  EMPTY_DATA,
-  type FinanceData,
-  type FinanceRepository,
-} from '@/features/store/finance-repository'
+import { EMPTY_DATA, type FinanceData } from '@/features/store/finance-repository'
 
 export interface MonthSummary {
   salary: number
@@ -57,32 +52,30 @@ async function syncToSupabase(data: FinanceData, userId: string, client: ReturnT
 
 export function FinanceProvider({
   children,
-  repository,
 }: {
   children: React.ReactNode
-  repository?: FinanceRepository
 }) {
-  const repoRef = React.useRef<FinanceRepository>(repository ?? createLocalFinanceRepository())
   const supabase = React.useMemo(() => createClient(), [])
   const { user } = useAuth()
   const [data, setData] = React.useState<FinanceData>(EMPTY_DATA)
   const [loaded, setLoaded] = React.useState(false)
+  const [remoteReady, setRemoteReady] = React.useState(false)
 
   React.useEffect(() => {
     let cancelled = false
     async function loadRemote() {
-      if (!user) { setData(EMPTY_DATA); setLoaded(true); return }
-      const local = repoRef.current.load()
-      const [{ data: remoteMonths }, { data: remoteDebts }] = await Promise.all([
+      if (!user) { setData(EMPTY_DATA); setRemoteReady(false); setLoaded(true); return }
+      const [{ data: remoteMonths, error: monthsError }, { data: remoteDebts, error: debtsError }] = await Promise.all([
         supabase.from('months').select('id, year, month, salary, status, created_at, updated_at').eq('user_id', user.id).order('year', { ascending: false }).order('month', { ascending: false }),
         supabase.from('debts').select('id, month_id, name, amount, due_date, notes, created_at, updated_at').eq('user_id', user.id).order('created_at'),
       ])
       if (cancelled) return
-      if (remoteMonths?.length) {
-        setData({ months: remoteMonths.map((m: { id: string; year: number; month: number; salary: number | string; status: 'active' | 'finished'; created_at: string; updated_at: string }) => ({ id: m.id, year: m.year, month: m.month, salary: Number(m.salary), status: m.status, createdAt: m.created_at, updatedAt: m.updated_at })), debts: (remoteDebts ?? []).map((d: { id: string; month_id: string; name: string; amount: number | string; due_date: string | null; notes: string | null; created_at: string; updated_at: string }) => ({ id: d.id, monthId: d.month_id, name: d.name, amount: Number(d.amount), dueDate: d.due_date, notes: d.notes, createdAt: d.created_at, updatedAt: d.updated_at })) })
+      if (monthsError || debtsError) {
+        console.error('[v0] Error cargando finanzas desde Supabase', monthsError ?? debtsError)
+        setRemoteReady(false)
       } else {
-        setData(local)
-        if (local.months.length) await syncToSupabase(local, user.id, supabase)
+        setRemoteReady(true)
+        setData({ months: (remoteMonths ?? []).map((m: { id: string; year: number; month: number; salary: number | string; status: 'active' | 'finished'; created_at: string; updated_at: string }) => ({ id: m.id, year: m.year, month: m.month, salary: Number(m.salary), status: m.status, createdAt: m.created_at, updatedAt: m.updated_at })), debts: (remoteDebts ?? []).map((d: { id: string; month_id: string; name: string; amount: number | string; due_date: string | null; notes: string | null; created_at: string; updated_at: string }) => ({ id: d.id, monthId: d.month_id, name: d.name, amount: Number(d.amount), dueDate: d.due_date, notes: d.notes, createdAt: d.created_at, updatedAt: d.updated_at })) })
       }
       setLoaded(true)
     }
@@ -91,9 +84,10 @@ export function FinanceProvider({
   }, [supabase, user])
 
   React.useEffect(() => {
-    if (!loaded || !user) return
-    repoRef.current.save(data)
-    void syncToSupabase(data, user.id, supabase)
+    if (!loaded || !remoteReady || !user) return
+    void syncToSupabase(data, user.id, supabase).catch((error) => {
+      console.error('[v0] Error guardando finanzas en Supabase', error)
+    })
   }, [data, loaded, supabase, user])
 
   const value = React.useMemo<FinanceContextValue>(() => {
