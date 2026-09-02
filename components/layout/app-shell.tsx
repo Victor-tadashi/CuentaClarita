@@ -2,7 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, CalendarDays, History, Wallet, LogOut, UserCircle } from 'lucide-react'
+import Image from 'next/image'
+import { LayoutDashboard, CalendarDays, History, LogOut, UserCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/features/auth/auth-provider'
 
@@ -19,13 +20,15 @@ function isActive(pathname: string, href: string) {
 
 function Brand() {
   return (
-    <Link href="/" className="flex items-center gap-2.5">
-      <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-        <Wallet className="size-4" />
-      </span>
-      <span className="text-[0.95rem] font-semibold tracking-tight">
-        CuentaClarita
-      </span>
+    <Link href="/" className="flex items-center" aria-label="CuentaClarita, ir al inicio">
+      <Image
+        src="/brand/cuenta-clarita.png"
+        alt="CuentaClarita — tus finanzas, siempre claras"
+        width={220}
+        height={92}
+        className="h-11 w-[10.5rem] rounded-md bg-card object-contain p-0.5"
+        priority
+      />
     </Link>
   )
 }

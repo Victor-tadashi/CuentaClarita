@@ -22,6 +22,10 @@ export const metadata: Metadata = {
   description:
     'Registra tu sueldo y tus deudas mensuales para saber exactamente cuánto dinero te queda disponible cada mes.',
   generator: 'v0.app',
+  icons: {
+    icon: [{ url: '/brand/cuenta-clarita.png', type: 'image/png' }],
+    apple: '/brand/cuenta-clarita.png',
+  },
 }
 
 export const viewport: Viewport = {

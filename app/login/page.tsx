@@ -3,7 +3,8 @@
 import * as React from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Wallet, LogIn, UserPlus } from 'lucide-react'
+import Image from 'next/image'
+import { LogIn, UserPlus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -48,10 +49,15 @@ export default function LoginPage() {
     <main className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
       <section className="w-full max-w-md">
         <div className="mb-8 flex flex-col items-center text-center">
-          <div className="mb-4 flex size-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-            <Wallet className="size-6" />
-          </div>
-          <h1 className="text-2xl font-semibold tracking-tight">CuentaClarita</h1>
+          <Image
+            src="/brand/cuenta-clarita.png"
+            alt="CuentaClarita — tus finanzas, siempre claras"
+            width={560}
+            height={240}
+            className="mb-4 h-24 w-full max-w-[22rem] rounded-xl bg-card object-contain p-2"
+            priority
+          />
+          <h1 className="sr-only">CuentaClarita</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             {registering ? 'Crea tu cuenta para ordenar tus finanzas.' : 'Tus finanzas claras, mes a mes.'}
           </p>
