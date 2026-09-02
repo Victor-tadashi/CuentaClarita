@@ -38,8 +38,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!response.ok || !result?.ok) return { ok: false, message: result?.message ?? 'No pudimos crear la cuenta. Revisa tus datos e inténtalo nuevamente.' }
       if (!supabase) return { ok: false, message: 'La cuenta fue creada, pero el servicio de autenticación no está disponible.' }
       const { error } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password })
-      if (error) return { ok: false, message: 'La cuenta fue creada, pero no pudimos iniciar la sesión. Inténtalo nuevamente.' }
-      router.replace('/'); return { ok: true }
+      if (error) return { ok: false, message: 'La cuenta fue creada, pero no pudimos iniciar la sesión automáticamente. Prueba iniciar sesión con tu correo y contraseña.' }
+      return { ok: true, message: 'Cuenta creada correctamente. Bienvenido a CuentaClarita.' }
     },
     async signOut() { await supabase.auth.signOut(); router.replace('/login') },
   }), [loaded, router, supabase, user])

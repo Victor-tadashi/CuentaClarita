@@ -2,6 +2,7 @@
 
 import * as React from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Wallet, LogIn, UserPlus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,17 +11,20 @@ import { useAuth } from '@/features/auth/auth-provider'
 
 export default function LoginPage() {
   const { signIn, signUp, user, loaded } = useAuth()
+  const router = useRouter()
   const [registering, setRegistering] = React.useState(false)
   const [name, setName] = React.useState('')
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
   const [error, setError] = React.useState('')
+  const [success, setSuccess] = React.useState('')
 
   if (!loaded || user) return null
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setError('')
+    setSuccess('')
     if (registering && name.trim().length < 2) {
       setError('Escribe tu nombre para continuar.')
       return
@@ -30,7 +34,14 @@ export default function LoginPage() {
       return
     }
     const result = registering ? await signUp(name, email, password) : await signIn(email, password)
-    if (!result.ok) setError(result.message ?? 'No pudimos completar la acción.')
+    if (!result.ok) {
+      setError(result.message ?? 'No pudimos completar la acción.')
+      return
+    }
+    if (registering) {
+      setSuccess(result.message ?? 'Cuenta creada correctamente. Bienvenido a CuentaClarita.')
+      window.setTimeout(() => router.replace('/'), 1200)
+    }
   }
 
   return (
@@ -73,7 +84,8 @@ export default function LoginPage() {
               <Input id="password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Mínimo 6 caracteres" autoComplete={registering ? 'new-password' : 'current-password'} required />
             </div>
             {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
-            <Button type="submit" size="lg" className="mt-2 w-full">
+            {success && <p className="text-sm text-primary" role="status">{success}</p>}
+            <Button type="submit" size="lg" className="mt-2 w-full" disabled={Boolean(success)}>
               {registering ? 'Crear cuenta' : 'Entrar a mi dashboard'}
             </Button>
           </form>
