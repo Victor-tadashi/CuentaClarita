@@ -36,10 +36,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const response = await fetch('/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, email, password }) })
       const result = await response.json().catch(() => null)
       if (!response.ok || !result?.ok) return { ok: false, message: result?.message ?? 'No pudimos crear la cuenta. Revisa tus datos e inténtalo nuevamente.' }
-      if (!supabase) return { ok: false, message: 'La cuenta fue creada, pero el servicio de autenticación no está disponible.' }
-      const { error } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password })
-      if (error) return { ok: false, message: 'La cuenta fue creada, pero no pudimos iniciar la sesión automáticamente. Prueba iniciar sesión con tu correo y contraseña.' }
-      return { ok: true, message: 'Cuenta creada correctamente. Bienvenido a CuentaClarita.' }
+      return { ok: true, message: 'Cuenta creada correctamente. Ahora inicia sesión con tu correo y contraseña.' }
     },
     async signOut() { await supabase.auth.signOut(); router.replace('/login') },
   }), [loaded, router, supabase, user])
