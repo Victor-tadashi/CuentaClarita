@@ -12,10 +12,11 @@ import { MonthDetailDialog } from '@/features/history/components/month-detail-di
 import type { Month } from '@/features/months/types'
 
 export function HistoryView() {
-  const { loaded, sortedMonths, getMonthSummary } = useFinance()
+  const { loaded, loadingError, retryLoad, sortedMonths, getMonthSummary } = useFinance()
   const [selected, setSelected] = React.useState<Month | null>(null)
 
-  if (!loaded) return null
+  if (!loaded) return <div className="flex min-h-48 items-center justify-center text-sm text-muted-foreground">Cargando historial...</div>
+  if (loadingError) return <div className="flex min-h-48 flex-col items-center justify-center gap-3 text-center"><p className="text-sm text-destructive">{loadingError}</p><button type="button" className="rounded-md border px-3 py-2 text-sm" onClick={retryLoad}>Reintentar</button></div>
 
   // Agrupar por año (descendente).
   const groups = new Map<number, Month[]>()

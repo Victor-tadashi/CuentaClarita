@@ -22,6 +22,8 @@ export function DashboardView() {
   const { user } = useAuth()
   const {
     loaded,
+    loadingError,
+    retryLoad,
     activeMonth,
     getMonthDebts,
     getMonthSummary,
@@ -36,7 +38,11 @@ export function DashboardView() {
   const [editing, setEditing] = React.useState<Debt | null>(null)
   const [pendingDelete, setPendingDelete] = React.useState<Debt | null>(null)
 
-  if (!loaded) return null
+  if (!loaded) return <div className="flex min-h-48 items-center justify-center text-sm text-muted-foreground">Cargando tus finanzas...</div>
+
+  if (loadingError) {
+    return <div className="flex min-h-48 flex-col items-center justify-center gap-3 text-center"><p className="text-sm text-destructive">{loadingError}</p><Button variant="outline" onClick={retryLoad}>Reintentar</Button></div>
+  }
 
   if (!activeMonth) {
     return (

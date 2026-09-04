@@ -33,9 +33,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       router.replace('/'); return { ok: true }
     },
     async signUp(name, email, password) {
-      const response = await fetch('/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, email, password }) })
-      const result = await response.json().catch(() => null)
-      if (!response.ok || !result?.ok) return { ok: false, message: result?.message ?? 'No pudimos crear la cuenta. Revisa tus datos e inténtalo nuevamente.' }
+      try {
+        const response = await fetch('/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, email, password }) })
+        const result = await response.json().catch(() => null)
+        if (!response.ok || !result?.ok) return { ok: false, message: result?.message ?? 'No pudimos crear la cuenta. Revisa tus datos e inténtalo nuevamente.' }
+      } catch {
+        return { ok: false, message: 'No pudimos conectar con el servidor. Revisa tu conexión e inténtalo nuevamente.' }
+      }
       return { ok: true, message: 'Cuenta creada correctamente. Ahora inicia sesión con tu correo y contraseña.' }
     },
     async signOut() { await supabase.auth.signOut(); router.replace('/login') },

@@ -17,6 +17,8 @@ export interface MonthSummary {
 
 interface FinanceContextValue {
   loaded: boolean
+  loadingError: string | null
+  retryLoad: () => void
   months: Month[]
   activeMonth: Month | null
   /** Meses ordenados del más reciente al más antiguo. */
@@ -60,14 +62,14 @@ async function syncToSupabase(data: FinanceData, userId: string, client: ReturnT
   const debtIds = debts.map((debt) => debt.id)
   const { data: remoteMonths, error: remoteMonthsError } = await client.from('months').select('id').eq('user_id', userId)
   if (remoteMonthsError) throw remoteMonthsError
-  const staleMonthIds = (remoteMonths ?? []).map((month) => month.id).filter((id) => !monthIds.includes(id))
+  const staleMonthIds = (remoteMonths ?? []).map((month: { id: string }) => month.id).filter((id: string) => !monthIds.includes(id))
   if (staleMonthIds.length) {
     const { error } = await client.from('months').delete().eq('user_id', userId).in('id', staleMonthIds)
     if (error) throw error
   }
   const { data: remoteDebts, error: remoteDebtsError } = await client.from('debts').select('id').eq('user_id', userId)
   if (remoteDebtsError) throw remoteDebtsError
-  const staleDebtIds = (remoteDebts ?? []).map((debt) => debt.id).filter((id) => !debtIds.includes(id))
+  const staleDebtIds = (remoteDebts ?? []).map((debt: { id: string }) => debt.id).filter((id: string) => !debtIds.includes(id))
   if (staleDebtIds.length) {
     const { error } = await client.from('debts').delete().eq('user_id', userId).in('id', staleDebtIds)
     if (error) throw error
@@ -84,6 +86,8 @@ export function FinanceProvider({
   const [data, setData] = React.useState<FinanceData>(EMPTY_DATA)
   const [loaded, setLoaded] = React.useState(false)
   const [remoteReady, setRemoteReady] = React.useState(false)
+  const [loadingError, setLoadingError] = React.useState<string | null>(null)
+  const [reloadKey, setReloadKey] = React.useState(0)
   const syncQueue = React.useRef(Promise.resolve())
 
   React.useEffect(() => {
@@ -98,7 +102,9 @@ export function FinanceProvider({
       if (monthsError || debtsError) {
         console.error('[v0] Error cargando finanzas desde Supabase', monthsError ?? debtsError)
         setRemoteReady(false)
+        setLoadingError('No pudimos cargar tus finanzas. Revisa tu conexión e inténtalo nuevamente.')
       } else {
+        setLoadingError(null)
         setRemoteReady(true)
         setData({ months: (remoteMonths ?? []).map((m: { id: string; year: number; month: number; salary: number | string; status: 'active' | 'finished'; created_at: string; updated_at: string }) => ({ id: m.id, year: m.year, month: m.month, salary: Number(m.salary), status: m.status, createdAt: m.created_at, updatedAt: m.updated_at })), debts: (remoteDebts ?? []).map((d: { id: string; month_id: string; name: string; amount: number | string; due_date: string | null; notes: string | null; created_at: string; updated_at: string }) => ({ id: d.id, monthId: d.month_id, name: d.name, amount: Number(d.amount), dueDate: d.due_date, notes: d.notes, createdAt: d.created_at, updatedAt: d.updated_at })) })
       }
@@ -106,7 +112,7 @@ export function FinanceProvider({
     }
     loadRemote()
     return () => { cancelled = true }
-  }, [supabase, user])
+  }, [reloadKey, supabase, user])
 
   React.useEffect(() => {
     if (!loaded || !remoteReady || !user || !supabase) return
@@ -243,6 +249,8 @@ export function FinanceProvider({
 
     return {
       loaded,
+      loadingError,
+      retryLoad: () => setReloadKey((key) => key + 1),
       months: data.months,
       activeMonth,
       sortedMonths,
