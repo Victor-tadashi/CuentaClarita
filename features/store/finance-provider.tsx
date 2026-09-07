@@ -18,7 +18,9 @@ export interface MonthSummary {
 interface FinanceContextValue {
   loaded: boolean
   loadingError: string | null
+  syncError: string | null
   retryLoad: () => void
+  retrySync: () => void
   months: Month[]
   activeMonth: Month | null
   /** Meses ordenados del más reciente al más antiguo. */
@@ -28,12 +30,12 @@ interface FinanceContextValue {
   getMonthSummary: (monthId: string) => MonthSummary
   /** Deudas del mes más reciente, útiles para importarlas al crear un mes. */
   getLatestDebts: () => DebtInput[]
-  createMonth: (input: NewMonthInput, debts: DebtInput[]) => Month
-  updateSalary: (monthId: string, salary: number) => void
-  deleteMonth: (monthId: string) => void
-  addDebt: (monthId: string, input: DebtInput) => void
-  updateDebt: (debtId: string, input: DebtInput) => void
-  deleteDebt: (debtId: string) => void
+  createMonth: (input: NewMonthInput, debts: DebtInput[]) => Promise<Month>
+  updateSalary: (monthId: string, salary: number) => Promise<void>
+  deleteMonth: (monthId: string) => Promise<void>
+  addDebt: (monthId: string, input: DebtInput) => Promise<void>
+  updateDebt: (debtId: string, input: DebtInput) => Promise<void>
+  deleteDebt: (debtId: string) => Promise<void>
 }
 
 const FinanceContext = React.createContext<FinanceContextValue | null>(null)
@@ -87,8 +89,41 @@ export function FinanceProvider({
   const [loaded, setLoaded] = React.useState(false)
   const [remoteReady, setRemoteReady] = React.useState(false)
   const [loadingError, setLoadingError] = React.useState<string | null>(null)
+  const [syncError, setSyncError] = React.useState<string | null>(null)
   const [reloadKey, setReloadKey] = React.useState(0)
-  const syncQueue = React.useRef(Promise.resolve())
+  const dataRef = React.useRef(data)
+  const lastSyncedData = React.useRef<FinanceData | null>(null)
+  const retrySyncAction = React.useRef<(() => Promise<void>) | null>(null)
+
+  React.useEffect(() => {
+    dataRef.current = data
+  }, [data])
+
+  const persistData = React.useCallback(async (nextData: FinanceData) => {
+    if (!user || !supabase) throw new Error('No hay una sesión activa.')
+    try {
+      await syncToSupabase(nextData, user.id, supabase)
+      lastSyncedData.current = nextData
+      setSyncError(null)
+    } catch (error) {
+      console.error('[v0] Error guardando finanzas en Supabase', error)
+      setSyncError('No pudimos guardar los cambios. Revisa tu conexión e inténtalo nuevamente.')
+      throw error
+    }
+  }, [supabase, user])
+
+  const commitData = React.useCallback(async (nextData: FinanceData) => {
+    const previousData = dataRef.current
+    dataRef.current = nextData
+    setData(nextData)
+    try {
+      await persistData(nextData)
+    } catch (error) {
+      dataRef.current = previousData
+      setData(previousData)
+      throw error
+    }
+  }, [persistData])
 
   React.useEffect(() => {
     let cancelled = false
@@ -113,17 +148,6 @@ export function FinanceProvider({
     loadRemote()
     return () => { cancelled = true }
   }, [reloadKey, supabase, user])
-
-  React.useEffect(() => {
-    if (!loaded || !remoteReady || !user || !supabase) return
-    const snapshot = data
-    syncQueue.current = syncQueue.current
-      .catch(() => undefined)
-      .then(() => syncToSupabase(snapshot, user.id, supabase))
-      .catch((error) => {
-        console.error('[v0] Error guardando finanzas en Supabase', error)
-      })
-  }, [data, loaded, remoteReady, supabase, user])
 
   const value = React.useMemo<FinanceContextValue>(() => {
     const sortedMonths = [...data.months].sort(compareMonthsDesc)
@@ -164,7 +188,7 @@ export function FinanceProvider({
 
     const now = () => new Date().toISOString()
 
-    const createMonth = (input: NewMonthInput, debts: DebtInput[]): Month => {
+    const createMonth = async (input: NewMonthInput, debts: DebtInput[]): Promise<Month> => {
       const timestamp = now()
       const month: Month = {
         id: createId(),
@@ -186,37 +210,59 @@ export function FinanceProvider({
         createdAt: new Date(Date.now() + index).toISOString(),
         updatedAt: timestamp,
       }))
-      setData((prev) => ({
-        // El nuevo mes pasa a ser el activo; el resto queda finalizado.
-        // Nunca se modifican los datos (sueldo/deudas) de meses anteriores.
+      if (!supabase || !user) throw new Error('No hay una sesión activa.')
+      const { error } = await supabase.rpc('create_month_with_debts', {
+        p_month_id: month.id,
+        p_year: month.year,
+        p_month: month.month,
+        p_salary: month.salary,
+        p_debts: newDebts.map((debt) => ({
+          id: debt.id,
+          name: debt.name,
+          amount: debt.amount,
+          due_date: debt.dueDate,
+          notes: debt.notes,
+          created_at: debt.createdAt,
+          updated_at: debt.updatedAt,
+        })),
+      })
+      if (error) {
+        retrySyncAction.current = async () => { await createMonth(input, debts) }
+        setSyncError('No pudimos crear el mes. Revisa tu conexión e inténtalo nuevamente.')
+        throw error
+      }
+      retrySyncAction.current = null
+      const nextData = {
         months: [
-          ...prev.months.map((m) =>
-            m.status === 'active' ? { ...m, status: 'finished' as const } : m,
-          ),
+          ...data.months.map((m) => m.status === 'active' ? { ...m, status: 'finished' as const } : m),
           month,
         ],
-        debts: [...prev.debts, ...newDebts],
-      }))
+        debts: [...data.debts, ...newDebts],
+      }
+      setData(nextData)
+      setSyncError(null)
       return month
     }
 
-    const updateSalary = (monthId: string, salary: number) => {
-      setData((prev) => ({
-        ...prev,
-        months: prev.months.map((m) =>
-          m.id === monthId ? { ...m, salary, updatedAt: now() } : m,
-        ),
-      }))
+    const updateSalary = async (monthId: string, salary: number) => {
+      const nextData = { ...data, months: data.months.map((m) => m.id === monthId ? { ...m, salary, updatedAt: now() } : m) }
+      await commitData(nextData)
     }
 
-    const deleteMonth = (monthId: string) => {
-      setData((prev) => ({
-        months: prev.months.filter((m) => m.id !== monthId),
-        debts: prev.debts.filter((d) => d.monthId !== monthId),
-      }))
+    const deleteMonth = async (monthId: string) => {
+      if (!supabase) throw new Error('No hay una sesión activa.')
+      const { error } = await supabase.rpc('delete_month_with_debts', { p_month_id: monthId })
+      if (error) {
+        retrySyncAction.current = async () => { await deleteMonth(monthId) }
+        setSyncError('No pudimos eliminar el mes. Revisa tu conexión e inténtalo nuevamente.')
+        throw error
+      }
+      retrySyncAction.current = null
+      setData({ months: data.months.filter((m) => m.id !== monthId), debts: data.debts.filter((d) => d.monthId !== monthId) })
+      setSyncError(null)
     }
 
-    const addDebt = (monthId: string, input: DebtInput) => {
+    const addDebt = async (monthId: string, input: DebtInput) => {
       const timestamp = now()
       const debt: Debt = {
         id: createId(),
@@ -228,29 +274,29 @@ export function FinanceProvider({
         createdAt: timestamp,
         updatedAt: timestamp,
       }
-      setData((prev) => ({ ...prev, debts: [...prev.debts, debt] }))
+      await commitData({ ...data, debts: [...data.debts, debt] })
     }
 
-    const updateDebt = (debtId: string, input: DebtInput) => {
-      setData((prev) => ({
-        ...prev,
-        debts: prev.debts.map((d) =>
-          d.id === debtId ? { ...d, ...input, updatedAt: now() } : d,
-        ),
-      }))
+    const updateDebt = async (debtId: string, input: DebtInput) => {
+      await commitData({ ...data, debts: data.debts.map((d) => d.id === debtId ? { ...d, ...input, updatedAt: now() } : d) })
     }
 
-    const deleteDebt = (debtId: string) => {
-      setData((prev) => ({
-        ...prev,
-        debts: prev.debts.filter((d) => d.id !== debtId),
-      }))
+    const deleteDebt = async (debtId: string) => {
+      await commitData({ ...data, debts: data.debts.filter((d) => d.id !== debtId) })
     }
 
     return {
       loaded,
       loadingError,
+      syncError,
       retryLoad: () => setReloadKey((key) => key + 1),
+      retrySync: () => {
+        if (retrySyncAction.current) {
+          void retrySyncAction.current()
+        } else {
+          void persistData(data)
+        }
+      },
       months: data.months,
       activeMonth,
       sortedMonths,
@@ -265,7 +311,7 @@ export function FinanceProvider({
       updateDebt,
       deleteDebt,
     }
-  }, [data, loaded, loadingError])
+  }, [data, loaded, loadingError, syncError, persistData, commitData, supabase, user])
 
   return (
     <FinanceContext.Provider value={value}>{children}</FinanceContext.Provider>

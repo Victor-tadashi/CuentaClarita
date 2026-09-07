@@ -14,7 +14,7 @@ import { MonthCard } from '@/features/months/components/month-card'
 import type { Month } from '@/features/months/types'
 
 export function MonthsView() {
-  const { loaded, loadingError, retryLoad, sortedMonths, getMonthSummary, deleteMonth } = useFinance()
+  const { loaded, loadingError, retryLoad, sortedMonths, getMonthSummary, deleteMonth, syncError, retrySync } = useFinance()
   const [pendingDelete, setPendingDelete] = React.useState<Month | null>(null)
 
   if (!loaded) return <div className="flex min-h-48 items-center justify-center text-sm text-muted-foreground">Cargando tus meses...</div>
@@ -37,6 +37,13 @@ export function MonthsView() {
           ) : undefined
         }
       />
+
+      {syncError ? (
+        <div className="mb-4 flex items-center justify-between gap-3 rounded-lg border border-negative/30 bg-negative/10 p-3 text-sm text-negative" role="alert">
+          <span>{syncError}</span>
+          <Button variant="outline" size="sm" onClick={retrySync}>Reintentar</Button>
+        </div>
+      ) : null}
 
       {sortedMonths.length === 0 ? (
         <EmptyState
@@ -75,10 +82,14 @@ export function MonthsView() {
             ? `¿Seguro que quieres eliminar ${monthLabel(pendingDelete.month, pendingDelete.year)} y todas sus deudas? Esta acción no se puede deshacer.`
             : undefined
         }
-        onConfirm={() => {
+        onConfirm={async () => {
           if (pendingDelete) {
-            deleteMonth(pendingDelete.id)
-            toast.success('Mes eliminado.')
+            try {
+              await deleteMonth(pendingDelete.id)
+              toast.success('Mes eliminado.')
+            } catch {
+              // El estado persistente de error informa al usuario y permite reintentar.
+            }
           }
         }}
       />

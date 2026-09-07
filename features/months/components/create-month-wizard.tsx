@@ -44,7 +44,7 @@ function toDraft(debt: DebtInput): DebtDraft {
 }
 
 export function CreateMonthWizard({ trigger }: { trigger: React.ReactNode }) {
-  const { months, getLatestDebts, createMonth } = useFinance()
+  const { months, getLatestDebts, createMonth, syncError, retrySync } = useFinance()
   const currentYear = new Date().getFullYear()
 
   const [open, setOpen] = React.useState(false)
@@ -103,16 +103,20 @@ export function CreateMonthWizard({ trigger }: { trigger: React.ReactNode }) {
       toDraft({ name: '', amount: 0, dueDate: null, notes: null }),
     ])
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     const debts: DebtInput[] = enabledDrafts.map((d) => ({
       name: d.name.trim(),
       amount: d.amount,
       dueDate: d.dueDate || null,
       notes: d.notes,
     }))
-    createMonth({ month, year, salary }, debts)
-    toast.success(`${monthLabel(month, year)} creado como mes activo.`)
-    setOpen(false)
+    try {
+      await createMonth({ month, year, salary }, debts)
+      toast.success(`${monthLabel(month, year)} creado como mes activo.`)
+      setOpen(false)
+    } catch {
+      // El aviso persistente de sincronización aparece debajo del resumen.
+    }
   }
 
   return (
@@ -328,6 +332,13 @@ export function CreateMonthWizard({ trigger }: { trigger: React.ReactNode }) {
             </div>
           ) : null}
         </div>
+
+        {syncError ? (
+          <div className="flex items-center justify-between gap-3 rounded-lg border border-negative/30 bg-negative/10 p-3 text-sm text-negative" role="alert">
+            <span>{syncError}</span>
+            <Button variant="outline" size="sm" onClick={retrySync}>Reintentar</Button>
+          </div>
+        ) : null}
 
         {/* Controles */}
         <div className="flex items-center justify-between gap-2">
