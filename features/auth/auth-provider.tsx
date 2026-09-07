@@ -1,7 +1,5 @@
 'use client'
 
-'use client'
-
 import * as React from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -20,7 +18,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = React.useState<SessionUser | null>(null); const [loaded, setLoaded] = React.useState(false)
   React.useEffect(() => {
     if (!supabase) return
-    supabase.auth.getUser().then(({ data }: { data: { user: Parameters<typeof mapUser>[0] | null } }) => { setUser(data.user ? mapUser(data.user) : null); setLoaded(true) })
+    supabase.auth.getUser().then(({ data }: { data: { user: Parameters<typeof mapUser>[0] | null } }) => { setUser(data.user ? mapUser(data.user) : null); setLoaded(true) }).catch(() => { setUser(null); setLoaded(true) })
     const { data } = supabase.auth.onAuthStateChange((_event: string, session: { user: Parameters<typeof mapUser>[0] | null } | null) => setUser(session?.user ? mapUser(session.user) : null))
     return () => data.subscription.unsubscribe()
   }, [supabase])

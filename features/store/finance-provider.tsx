@@ -265,7 +265,7 @@ export function FinanceProvider({
       updateDebt,
       deleteDebt,
     }
-  }, [data, loaded])
+  }, [data, loaded, loadingError])
 
   return (
     <FinanceContext.Provider value={value}>{children}</FinanceContext.Provider>
