@@ -22,6 +22,8 @@ export function DashboardView() {
   const { user } = useAuth()
   const {
     loaded,
+    loadingError,
+    retryLoad,
     activeMonth,
     getMonthDebts,
     getMonthSummary,
@@ -29,6 +31,8 @@ export function DashboardView() {
     addDebt,
     updateDebt,
     deleteDebt,
+    syncError,
+    retrySync,
   } = useFinance()
 
   const [salaryOpen, setSalaryOpen] = React.useState(false)
@@ -36,7 +40,11 @@ export function DashboardView() {
   const [editing, setEditing] = React.useState<Debt | null>(null)
   const [pendingDelete, setPendingDelete] = React.useState<Debt | null>(null)
 
-  if (!loaded) return null
+  if (!loaded) return <div className="flex min-h-48 items-center justify-center text-sm text-muted-foreground">Cargando tus finanzas...</div>
+
+  if (loadingError) {
+    return <div className="flex min-h-48 flex-col items-center justify-center gap-3 text-center"><p className="text-sm text-destructive">{loadingError}</p><Button variant="outline" onClick={retryLoad}>Reintentar</Button></div>
+  }
 
   if (!activeMonth) {
     return (
@@ -72,13 +80,17 @@ export function DashboardView() {
     setFormOpen(true)
   }
 
-  const handleSubmit = (input: DebtInput) => {
-    if (editing) {
-      updateDebt(editing.id, input)
-      toast.success('Deuda actualizada.')
-    } else {
-      addDebt(activeMonth.id, input)
-      toast.success('Deuda agregada.')
+  const handleSubmit = async (input: DebtInput) => {
+    try {
+      if (editing) {
+        await updateDebt(editing.id, input)
+        toast.success('Deuda actualizada.')
+      } else {
+        await addDebt(activeMonth.id, input)
+        toast.success('Deuda agregada.')
+      }
+    } catch {
+      // El estado persistente de error informa al usuario y permite reintentar.
     }
   }
 
@@ -103,6 +115,13 @@ export function DashboardView() {
           </div>
         }
       />
+
+      {syncError ? (
+        <div className="mb-4 flex items-center justify-between gap-3 rounded-lg border border-negative/30 bg-negative/10 p-3 text-sm text-negative" role="alert">
+          <span>{syncError}</span>
+          <Button variant="outline" size="sm" onClick={retrySync}>Reintentar</Button>
+        </div>
+      ) : null}
 
       <SummaryCards summary={summary} />
 
@@ -146,9 +165,13 @@ export function DashboardView() {
         open={salaryOpen}
         onOpenChange={setSalaryOpen}
         initialSalary={activeMonth.salary}
-        onSave={(salary) => {
-          updateSalary(activeMonth.id, salary)
-          toast.success('Sueldo actualizado.')
+          onSave={async (salary) => {
+          try {
+            await updateSalary(activeMonth.id, salary)
+            toast.success('Sueldo actualizado.')
+          } catch {
+            // El estado persistente de error informa al usuario y permite reintentar.
+          }
         }}
       />
 
@@ -178,10 +201,14 @@ export function DashboardView() {
             ? `¿Seguro que quieres eliminar "${pendingDelete.name}"? Esta acción no se puede deshacer.`
             : undefined
         }
-        onConfirm={() => {
+        onConfirm={async () => {
           if (pendingDelete) {
-            deleteDebt(pendingDelete.id)
-            toast.success('Deuda eliminada.')
+            try {
+              await deleteDebt(pendingDelete.id)
+              toast.success('Deuda eliminada.')
+            } catch {
+              // El estado persistente de error informa al usuario y permite reintentar.
+            }
           }
         }}
       />
