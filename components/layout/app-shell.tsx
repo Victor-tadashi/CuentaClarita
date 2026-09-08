@@ -95,8 +95,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Encabezado — móvil */}
-      <header className="sticky top-0 z-30 flex h-14 items-center border-b border-border bg-background/80 px-4 backdrop-blur-md md:hidden">
+      <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/80 px-4 backdrop-blur-md md:hidden">
         <Brand />
+        <button
+          type="button"
+          onClick={signOut}
+          className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          aria-label="Cerrar sesión"
+          title="Cerrar sesión"
+        >
+          <LogOut className="size-5" />
+        </button>
       </header>
 
       {/* Contenido */}
