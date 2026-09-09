@@ -14,10 +14,10 @@ import { MonthCard } from '@/features/months/components/month-card'
 import type { Month } from '@/features/months/types'
 
 export function MonthsView() {
-  const { loaded, loadingError, retryLoad, sortedMonths, getMonthSummary, deleteMonth, syncError, retrySync } = useFinance()
+  const { loaded, loadingError, loadingMessage, retryLoad, sortedMonths, getMonthSummary, deleteMonth, syncError, retrySync } = useFinance()
   const [pendingDelete, setPendingDelete] = React.useState<Month | null>(null)
 
-  if (!loaded) return <div className="flex min-h-48 items-center justify-center text-sm text-muted-foreground">Cargando tus meses...</div>
+  if (!loaded) return <div className="flex min-h-48 items-center justify-center text-sm text-muted-foreground">{loadingMessage ?? 'Cargando tus meses...'}</div>
   if (loadingError) return <div className="flex min-h-48 flex-col items-center justify-center gap-3 text-center"><p className="text-sm text-destructive">{loadingError}</p><Button variant="outline" onClick={retryLoad}>Reintentar</Button></div>
 
   return (

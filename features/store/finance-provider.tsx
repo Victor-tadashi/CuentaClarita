@@ -18,6 +18,7 @@ export interface MonthSummary {
 interface FinanceContextValue {
   loaded: boolean
   loadingError: string | null
+  loadingMessage: string | null
   syncError: string | null
   retryLoad: () => void
   retrySync: () => void
@@ -43,6 +44,31 @@ const FinanceContext = React.createContext<FinanceContextValue | null>(null)
 function compareMonthsDesc(a: Month, b: Month) {
   if (a.year !== b.year) return b.year - a.year
   return b.month - a.month
+}
+
+function isJwtTimingError(error: unknown) {
+  const value = error as { code?: string; message?: string } | null
+  const message = value?.message?.toLowerCase() ?? ''
+  return value?.code === 'PGRST303' || message.includes('jwt issued at future') || message.includes('jwt') && message.includes('future')
+}
+
+function isNetworkError(error: unknown) {
+  if (isJwtTimingError(error)) return false
+  const value = error as { code?: string; message?: string } | null
+  const message = value?.message?.toLowerCase() ?? ''
+  return value?.code === 'ECONNABORTED' || message.includes('network') || message.includes('timeout') || message.includes('fetch failed')
+}
+
+async function wait(milliseconds: number) {
+  await new Promise<void>((resolve) => window.setTimeout(resolve, milliseconds))
+}
+
+async function loadFinanceQueries(client: ReturnType<typeof createClient>, userId: string) {
+  const [{ data: remoteMonths, error: monthsError }, { data: remoteDebts, error: debtsError }] = await Promise.all([
+    client.from('months').select('id, year, month, salary, status, created_at, updated_at').eq('user_id', userId).order('year', { ascending: false }).order('month', { ascending: false }),
+    client.from('debts').select('id, month_id, name, amount, due_date, notes, created_at, updated_at').eq('user_id', userId).order('created_at'),
+  ])
+  return { remoteMonths, remoteDebts, monthsError, debtsError }
 }
 
 async function syncToSupabase(data: FinanceData, userId: string, client: ReturnType<typeof createClient>) {
@@ -89,6 +115,7 @@ export function FinanceProvider({
   const [loaded, setLoaded] = React.useState(false)
   const [remoteReady, setRemoteReady] = React.useState(false)
   const [loadingError, setLoadingError] = React.useState<string | null>(null)
+  const [loadingMessage, setLoadingMessage] = React.useState<string | null>(null)
   const [syncError, setSyncError] = React.useState<string | null>(null)
   const [reloadKey, setReloadKey] = React.useState(0)
   const dataRef = React.useRef(data)
@@ -128,20 +155,43 @@ export function FinanceProvider({
   React.useEffect(() => {
     let cancelled = false
     async function loadRemote() {
-      if (!user || !supabase) { setData(EMPTY_DATA); setRemoteReady(false); setLoaded(true); return }
-      const [{ data: remoteMonths, error: monthsError }, { data: remoteDebts, error: debtsError }] = await Promise.all([
-        supabase.from('months').select('id, year, month, salary, status, created_at, updated_at').eq('user_id', user.id).order('year', { ascending: false }).order('month', { ascending: false }),
-        supabase.from('debts').select('id, month_id, name, amount, due_date, notes, created_at, updated_at').eq('user_id', user.id).order('created_at'),
-      ])
-      if (cancelled) return
-      if (monthsError || debtsError) {
-        console.error('[v0] Error cargando finanzas desde Supabase', monthsError ?? debtsError)
+      if (!user || !supabase) { setData(EMPTY_DATA); setRemoteReady(false); setLoaded(true); setLoadingMessage(null); return }
+      setLoaded(false)
+      setLoadingError(null)
+      setLoadingMessage(null)
+
+      let result: Awaited<ReturnType<typeof loadFinanceQueries>> | null = null
+      let lastError: unknown = null
+      const maxAttempts = 4
+
+      for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+        if (cancelled) return
+        result = await loadFinanceQueries(supabase, user.id)
+        lastError = result.monthsError ?? result.debtsError
+        if (!lastError) break
+        if (!isJwtTimingError(lastError) || attempt === maxAttempts - 1) break
+        setLoadingMessage('Sincronizando sesión...')
+        await supabase.auth.refreshSession().catch((error: unknown) => {
+          console.error('[v0] No se pudo renovar la sesión antes del reintento', error)
+        })
+        await wait(1000 * (2 ** attempt))
+      }
+
+      if (cancelled || !result) return
+      if (lastError) {
+        console.error('[v0] Error cargando finanzas desde Supabase', lastError)
         setRemoteReady(false)
-        setLoadingError('No pudimos cargar tus finanzas. Revisa tu conexión e inténtalo nuevamente.')
+        setLoadingMessage(null)
+        setLoadingError(isJwtTimingError(lastError)
+          ? 'No pudimos validar tu sesión. Por favor vuelve a iniciar sesión.'
+          : isNetworkError(lastError)
+            ? 'No pudimos conectar con tus finanzas. Revisa tu conexión e inténtalo nuevamente.'
+            : 'No pudimos cargar tus finanzas. Inténtalo nuevamente.')
       } else {
         setLoadingError(null)
+        setLoadingMessage(null)
         setRemoteReady(true)
-        setData({ months: (remoteMonths ?? []).map((m: { id: string; year: number; month: number; salary: number | string; status: 'active' | 'finished'; created_at: string; updated_at: string }) => ({ id: m.id, year: m.year, month: m.month, salary: Number(m.salary), status: m.status, createdAt: m.created_at, updatedAt: m.updated_at })), debts: (remoteDebts ?? []).map((d: { id: string; month_id: string; name: string; amount: number | string; due_date: string | null; notes: string | null; created_at: string; updated_at: string }) => ({ id: d.id, monthId: d.month_id, name: d.name, amount: Number(d.amount), dueDate: d.due_date, notes: d.notes, createdAt: d.created_at, updatedAt: d.updated_at })) })
+        setData({ months: (result.remoteMonths ?? []).map((m: { id: string; year: number; month: number; salary: number | string; status: 'active' | 'finished'; created_at: string; updated_at: string }) => ({ id: m.id, year: m.year, month: m.month, salary: Number(m.salary), status: m.status, createdAt: m.created_at, updatedAt: m.updated_at })), debts: (result.remoteDebts ?? []).map((d: { id: string; month_id: string; name: string; amount: number | string; due_date: string | null; notes: string | null; created_at: string; updated_at: string }) => ({ id: d.id, monthId: d.month_id, name: d.name, amount: Number(d.amount), dueDate: d.due_date, notes: d.notes, createdAt: d.created_at, updatedAt: d.updated_at })) })
       }
       setLoaded(true)
     }
@@ -288,6 +338,7 @@ export function FinanceProvider({
     return {
       loaded,
       loadingError,
+      loadingMessage,
       syncError,
       retryLoad: () => setReloadKey((key) => key + 1),
       retrySync: () => {
@@ -311,7 +362,7 @@ export function FinanceProvider({
       updateDebt,
       deleteDebt,
     }
-  }, [data, loaded, loadingError, syncError, persistData, commitData, supabase, user])
+  }, [data, loaded, loadingError, loadingMessage, syncError, persistData, commitData, supabase, user])
 
   return (
     <FinanceContext.Provider value={value}>{children}</FinanceContext.Provider>
