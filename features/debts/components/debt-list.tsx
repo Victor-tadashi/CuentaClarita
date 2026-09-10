@@ -18,13 +18,13 @@ export function DebtList({
   onDelete?: (debt: Debt) => void
 }) {
   return (
-    <ul className="divide-y divide-border overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10">
+    <ul className="dashboard-debt-list divide-y overflow-hidden rounded-2xl">
       {debts.map((debt) => {
         const due = formatDueDate(debt.dueDate)
         return (
           <li
             key={debt.id}
-            className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-accent/30"
+            className="dashboard-debt-row flex items-center gap-4 px-5 py-4 transition-colors hover:bg-accent/20"
           >
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium">{debt.name}</p>

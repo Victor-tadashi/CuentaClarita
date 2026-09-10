@@ -126,9 +126,9 @@ export function DashboardView() {
 
       <SummaryCards summary={summary} />
 
-      <section className="mt-8">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-muted-foreground">
+      <section className="dashboard-debts-section mt-10">
+        <div className="mb-5 flex items-center justify-between gap-4">
+          <h2 className="text-xl font-semibold tracking-tight">
             Deudas del mes
             {debts.length > 0 ? (
               <span className="ml-1.5 text-muted-foreground/70">

@@ -44,9 +44,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   if (!loaded || !user) return null
 
   return (
-    <div className="min-h-screen md:flex">
+    <div className="dashboard-shell min-h-screen md:flex">
       {/* Sidebar — escritorio */}
-      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-border bg-sidebar px-4 py-5 md:flex">
+      <aside className="dashboard-sidebar sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r px-4 py-5 md:flex">
         <div className="px-2">
           <Brand />
         </div>
@@ -58,11 +58,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'flex items-center gap-3 rounded-lg px-2.5 py-2 text-sm font-medium transition-colors',
+                  'dashboard-nav-item flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-colors',
                   active
                     ? 'bg-accent text-accent-foreground'
                     : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground',
                 )}
+                aria-current={active ? 'page' : undefined}
               >
                 <item.icon className="size-4" />
                 {item.label}
@@ -74,7 +75,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <p className="px-2.5 text-xs leading-relaxed text-muted-foreground">
             ¿Cuánto dinero te quedará este mes después de pagar tus deudas?
           </p>
-          <div className="flex items-center justify-between gap-2 rounded-xl border border-border bg-card/60 p-2.5">
+          <div className="dashboard-user-card flex items-center justify-between gap-2 rounded-xl p-2.5">
             <div className="flex min-w-0 items-center gap-2">
               <UserCircle className="size-5 shrink-0 text-primary" />
               <div className="min-w-0">
@@ -109,8 +110,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </header>
 
       {/* Contenido */}
-      <main className="flex-1 px-4 pb-24 pt-6 md:px-8 md:pb-10 md:pt-8">
-        <div className="mx-auto w-full max-w-5xl">{children}</div>
+      <main className="dashboard-main flex-1 px-4 pb-24 pt-6 md:px-8 md:pb-10 md:pt-8">
+        <div className="mx-auto w-full max-w-7xl">{children}</div>
       </main>
 
       {/* Navegación inferior — móvil */}

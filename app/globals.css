@@ -91,6 +91,33 @@
   --input: oklch(1 0 0 / 12%);
   --ring: oklch(0.63 0.19 285);
 
+  --login-background: #070b17;
+  --login-background-deep: #0b1020;
+  --login-panel: oklch(0.18 0.045 270 / 82%);
+  --login-input-background: oklch(0.22 0.04 270 / 72%);
+  --login-logo-background: oklch(0.98 0.005 270);
+  --login-accent: oklch(0.72 0.2 285);
+  --login-border: oklch(0.7 0.16 275 / 38%);
+  --login-border-strong: oklch(0.68 0.08 270 / 34%);
+  --login-highlight: oklch(0.9 0.1 275 / 14%);
+  --login-shadow: oklch(0.03 0.04 270 / 58%);
+  --login-icon-background: oklch(0.3 0.14 280 / 54%);
+  --login-focus-ring: oklch(0.72 0.2 285 / 28%);
+  --login-placeholder: oklch(0.76 0.04 275);
+  --login-button: linear-gradient(105deg, oklch(0.68 0.21 285), oklch(0.59 0.2 265));
+  --login-button-shadow: oklch(0.45 0.12 275 / 22%);
+  --login-orb: oklch(0.35 0.24 270 / 35%);
+
+  --dashboard-background: #080d1b;
+  --dashboard-sidebar: #0d1528;
+  --dashboard-surface: #111b31;
+  --dashboard-surface-raised: #172340;
+  --dashboard-border: oklch(0.54 0.08 265 / 28%);
+  --dashboard-border-soft: oklch(0.6 0.06 265 / 18%);
+  --dashboard-blue: oklch(0.62 0.2 265);
+  --dashboard-red: oklch(0.66 0.2 20);
+  --dashboard-green: oklch(0.72 0.19 155);
+
   --chart-1: oklch(0.63 0.19 285);
   --chart-2: oklch(0.72 0.16 158);
   --chart-3: oklch(0.68 0.19 22);
@@ -107,6 +134,271 @@
   --sidebar-accent-foreground: oklch(0.97 0.004 285);
   --sidebar-border: oklch(1 0 0 / 8%);
   --sidebar-ring: oklch(0.63 0.19 285);
+}
+
+.dashboard-shell {
+  min-height: 100vh;
+  background: radial-gradient(circle at 82% -8%, oklch(0.35 0.2 275 / 22%), transparent 28%), var(--dashboard-background);
+}
+
+.dashboard-sidebar {
+  border-color: var(--dashboard-border-soft);
+  background: linear-gradient(180deg, var(--dashboard-sidebar), oklch(0.09 0.035 265));
+  box-shadow: inset -1px 0 0 oklch(0.75 0.1 270 / 4%);
+}
+
+.dashboard-sidebar > div:first-child {
+  padding: 0.75rem;
+  border: 1px solid var(--dashboard-border-soft);
+  border-radius: 1.25rem;
+  background: oklch(0.1 0.04 265 / 58%);
+}
+
+.dashboard-nav-item {
+  color: oklch(0.78 0.025 270);
+}
+
+.dashboard-nav-item:hover {
+  background: oklch(0.32 0.12 270 / 35%);
+  color: var(--foreground);
+}
+
+.dashboard-nav-item[aria-current='page'] {
+  background: linear-gradient(105deg, oklch(0.39 0.18 275), oklch(0.32 0.15 265));
+  color: var(--foreground);
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 10%), 0 0.5rem 1.25rem oklch(0.2 0.14 275 / 20%);
+}
+
+.dashboard-user-card {
+  border: 1px solid var(--dashboard-border-soft);
+  background: oklch(0.14 0.045 265 / 78%);
+}
+
+.dashboard-main {
+  background: transparent;
+}
+
+.dashboard-summary-card {
+  border: 1px solid var(--dashboard-border-soft);
+  background: linear-gradient(145deg, oklch(0.13 0.04 265 / 96%), var(--dashboard-surface));
+  box-shadow: 0 1rem 2rem oklch(0.02 0.04 265 / 22%), inset 0 1px 0 oklch(1 0 0 / 4%);
+}
+
+.dashboard-summary-card:nth-child(1) {
+  border-color: oklch(0.62 0.2 265 / 72%);
+}
+
+.dashboard-summary-card:nth-child(2) {
+  border-color: oklch(0.62 0.18 20 / 62%);
+  background: linear-gradient(145deg, oklch(0.16 0.045 20 / 74%), oklch(0.14 0.035 265));
+}
+
+.dashboard-summary-card:nth-child(3) {
+  border-color: oklch(0.63 0.17 155 / 64%);
+  background: linear-gradient(145deg, oklch(0.14 0.055 155 / 74%), oklch(0.13 0.04 265));
+}
+
+.dashboard-summary-icon {
+  background: oklch(0.29 0.12 270 / 55%);
+}
+
+.dashboard-summary-card:nth-child(2) .dashboard-summary-icon {
+  background: oklch(0.32 0.12 20 / 38%);
+  color: var(--dashboard-red);
+}
+
+.dashboard-summary-card:nth-child(3) .dashboard-summary-icon {
+  background: oklch(0.32 0.12 155 / 38%);
+  color: var(--dashboard-green);
+}
+
+.dashboard-debts-section {
+  border-radius: 1rem;
+}
+
+.dashboard-debt-list {
+  border: 1px solid var(--dashboard-border-soft);
+  background: linear-gradient(145deg, oklch(0.12 0.04 265 / 98%), oklch(0.1 0.035 265 / 98%));
+  box-shadow: 0 1rem 2rem oklch(0.02 0.04 265 / 18%);
+}
+
+.dashboard-debt-list > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--dashboard-border-soft);
+}
+
+.dashboard-debt-row {
+  min-height: 5.5rem;
+}
+
+.dashboard-debt-row:hover {
+  background: oklch(0.24 0.07 265 / 22%);
+}
+
+.login-page {
+  position: relative;
+  isolation: isolate;
+  background: radial-gradient(circle at 50% 38%, oklch(0.2 0.08 270 / 55%), transparent 42%), linear-gradient(135deg, var(--login-background), var(--login-background-deep));
+}
+
+.login-page::before {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background: radial-gradient(circle at 50% 45%, oklch(0.35 0.16 275 / 18%), transparent 48%);
+  content: '';
+}
+
+.login-content {
+  position: relative;
+  z-index: 1;
+}
+
+.login-brand-frame {
+  display: flex;
+  width: min(100%, 21.25rem);
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--login-border);
+  border-radius: 1.25rem;
+  background: oklch(0.12 0.04 270 / 72%);
+  padding: 0.35rem;
+  box-shadow: 0 0.5rem 1.25rem var(--login-shadow), inset 0 1px 0 var(--login-highlight);
+}
+
+.login-brand-image {
+  height: 5rem;
+  width: min(100%, 18rem);
+  border-radius: 0.75rem;
+  background: var(--login-logo-background);
+  object-fit: contain;
+  padding: 0.45rem;
+}
+
+.login-card {
+  border: 1px solid var(--login-border-strong);
+  background: var(--login-panel);
+  box-shadow: 0 1.25rem 3rem var(--login-shadow), inset 0 1px 0 var(--login-highlight);
+  backdrop-filter: blur(1rem);
+}
+
+.login-icon {
+  border: 1px solid var(--login-border-strong);
+  background: var(--login-icon-background);
+  color: var(--login-accent);
+  box-shadow: 0 0 1.5rem var(--login-button-shadow);
+}
+
+.login-input-wrap {
+  position: relative;
+}
+
+.login-field-icon {
+  position: absolute;
+  top: 50%;
+  left: 1rem;
+  z-index: 1;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--login-placeholder);
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.login-input {
+  border-color: var(--login-border);
+  background: var(--login-input-background);
+  color: var(--foreground);
+  transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
+}
+
+.login-input:focus-visible {
+  border-color: var(--login-accent);
+  background: oklch(0.24 0.045 270 / 78%);
+  box-shadow: 0 0 0 3px var(--login-focus-ring);
+}
+
+.login-input::placeholder {
+  color: var(--login-placeholder);
+}
+
+.login-password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.625rem;
+  color: var(--login-placeholder);
+  transform: translateY(-50%);
+  transition: color 150ms ease, background 150ms ease;
+}
+
+.login-password-toggle:hover,
+.login-password-toggle:focus-visible {
+  background: oklch(1 0 0 / 8%);
+  color: var(--foreground);
+  outline: none;
+}
+
+.login-submit {
+  background: var(--login-button);
+  box-shadow: 0 0.75rem 1.75rem var(--login-button-shadow);
+  transition: transform 150ms ease, box-shadow 150ms ease, filter 150ms ease;
+}
+
+.login-submit:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow: 0 0.75rem 1.25rem var(--login-button-shadow);
+}
+
+.login-submit:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.login-security-note {
+  color: oklch(0.78 0.04 275);
+}
+
+.login-orb {
+  position: absolute;
+  z-index: -1;
+  width: 22rem;
+  height: 22rem;
+  border-radius: 999px;
+  background: var(--login-orb);
+  filter: blur(1px);
+  opacity: 0.85;
+}
+
+.login-orb-left {
+  top: -13rem;
+  left: -11rem;
+}
+
+.login-orb-right {
+  right: -12rem;
+  bottom: -13rem;
+}
+
+@media (max-width: 640px) {
+  .login-brand-frame {
+    width: min(100%, 19rem);
+  }
+
+  .login-brand-image {
+    height: 4.25rem;
+    width: min(100%, 16rem);
+  }
+
+  .login-card {
+    border-radius: 1.25rem;
+    padding: 1.25rem;
+  }
 }
 
 @layer base {
