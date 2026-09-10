@@ -49,7 +49,7 @@ export default function LoginPage() {
     <main className="login-page flex min-h-screen items-center justify-center overflow-hidden px-4 py-10 sm:px-6">
       <div className="login-orb login-orb-left" aria-hidden="true" />
       <div className="login-orb login-orb-right" aria-hidden="true" />
-      <section className="login-content w-full max-w-3xl">
+      <section className="login-content w-full max-w-2xl">
         <div className="mb-8 flex flex-col items-center text-center sm:mb-10">
           <div className="login-brand-frame">
             <Image
@@ -67,13 +67,13 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <div className="login-card rounded-2xl p-6 sm:p-12">
+        <div className="login-card rounded-2xl p-5 sm:p-8">
           <div className="mb-8 flex items-center gap-4">
-            <span className="login-icon flex size-16 shrink-0 items-center justify-center rounded-2xl">
+            <span className="login-icon flex size-14 shrink-0 items-center justify-center rounded-2xl">
               {registering ? <UserPlus className="size-8" /> : <LogIn className="size-8" />}
             </span>
             <div>
-              <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">{registering ? 'Crear cuenta' : 'Iniciar sesión'}</h2>
+              <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">{registering ? 'Crear cuenta' : 'Iniciar sesión'}</h2>
               <p className="mt-1 text-base text-muted-foreground sm:text-lg">Acceso seguro con Supabase.</p>
             </div>
           </div>
@@ -87,15 +87,15 @@ export default function LoginPage() {
             )}
             <div className="flex flex-col gap-2">
               <Label className="text-base" htmlFor="email">Correo electrónico</Label>
-              <Input className="login-input h-16 rounded-xl px-5 text-lg" id="email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="tu@correo.com" autoComplete="email" required />
+              <Input className="login-input h-14 rounded-xl px-4 text-base" id="email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="tu@correo.com" autoComplete="email" required />
             </div>
             <div className="flex flex-col gap-2">
               <Label className="text-base" htmlFor="password">Contraseña</Label>
-              <Input className="login-input h-16 rounded-xl px-5 text-lg" id="password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Mínimo 6 caracteres" autoComplete={registering ? 'new-password' : 'current-password'} required />
+              <Input className="login-input h-14 rounded-xl px-4 text-base" id="password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Mínimo 6 caracteres" autoComplete={registering ? 'new-password' : 'current-password'} required />
             </div>
             {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
             {success && <p className="text-sm text-primary" role="status">{success}</p>}
-            <Button type="submit" size="lg" className="login-submit mt-3 h-16 w-full rounded-xl text-lg font-semibold" disabled={Boolean(success)}>
+            <Button type="submit" size="lg" className="login-submit mt-2 h-14 w-full rounded-xl text-base font-semibold" disabled={Boolean(success)}>
               {registering ? 'Crear cuenta' : 'Entrar a mi dashboard'}
             </Button>
           </form>

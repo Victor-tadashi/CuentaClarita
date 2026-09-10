@@ -147,7 +147,7 @@
 
 .login-brand-frame {
   display: flex;
-  width: min(100%, 36rem);
+  width: min(100%, 30rem);
   align-items: center;
   justify-content: center;
   border: 1px solid var(--login-border);
