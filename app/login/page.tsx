@@ -57,7 +57,7 @@ export default function LoginPage() {
       <div className="login-orb login-orb-left" aria-hidden="true" />
       <div className="login-orb login-orb-right" aria-hidden="true" />
       <section className="login-content w-full max-w-lg">
-        <div className="mb-5 flex flex-col items-center text-center sm:mb-6">
+        <div className="mb-4 flex flex-col items-center text-center sm:mb-5">
           <div className="login-brand-frame">
             <Image
               src="/brand/cuenta-clarita.png"
@@ -69,7 +69,7 @@ export default function LoginPage() {
             />
           </div>
           <h1 className="sr-only">CuentaClarita</h1>
-          <p className="mt-3 text-base text-muted-foreground sm:text-lg">
+          <p className="mt-2 text-base text-muted-foreground sm:text-lg">
             {registering ? 'Crea tu cuenta para ordenar tus finanzas.' : 'Tus finanzas claras, mes a mes.'}
           </p>
         </div>
