@@ -108,6 +108,16 @@
   --login-button-shadow: oklch(0.45 0.12 275 / 22%);
   --login-orb: oklch(0.35 0.24 270 / 35%);
 
+  --dashboard-background: #080d1b;
+  --dashboard-sidebar: #0d1528;
+  --dashboard-surface: #111b31;
+  --dashboard-surface-raised: #172340;
+  --dashboard-border: oklch(0.54 0.08 265 / 28%);
+  --dashboard-border-soft: oklch(0.6 0.06 265 / 18%);
+  --dashboard-blue: oklch(0.62 0.2 265);
+  --dashboard-red: oklch(0.66 0.2 20);
+  --dashboard-green: oklch(0.72 0.19 155);
+
   --chart-1: oklch(0.63 0.19 285);
   --chart-2: oklch(0.72 0.16 158);
   --chart-3: oklch(0.68 0.19 22);
@@ -124,6 +134,104 @@
   --sidebar-accent-foreground: oklch(0.97 0.004 285);
   --sidebar-border: oklch(1 0 0 / 8%);
   --sidebar-ring: oklch(0.63 0.19 285);
+}
+
+.dashboard-shell {
+  min-height: 100vh;
+  background: radial-gradient(circle at 82% -8%, oklch(0.35 0.2 275 / 22%), transparent 28%), var(--dashboard-background);
+}
+
+.dashboard-sidebar {
+  border-color: var(--dashboard-border-soft);
+  background: linear-gradient(180deg, var(--dashboard-sidebar), oklch(0.09 0.035 265));
+  box-shadow: inset -1px 0 0 oklch(0.75 0.1 270 / 4%);
+}
+
+.dashboard-sidebar > div:first-child {
+  padding: 0.75rem;
+  border: 1px solid var(--dashboard-border-soft);
+  border-radius: 1.25rem;
+  background: oklch(0.1 0.04 265 / 58%);
+}
+
+.dashboard-nav-item {
+  color: oklch(0.78 0.025 270);
+}
+
+.dashboard-nav-item:hover {
+  background: oklch(0.32 0.12 270 / 35%);
+  color: var(--foreground);
+}
+
+.dashboard-nav-item[aria-current='page'] {
+  background: linear-gradient(105deg, oklch(0.39 0.18 275), oklch(0.32 0.15 265));
+  color: var(--foreground);
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 10%), 0 0.5rem 1.25rem oklch(0.2 0.14 275 / 20%);
+}
+
+.dashboard-user-card {
+  border: 1px solid var(--dashboard-border-soft);
+  background: oklch(0.14 0.045 265 / 78%);
+}
+
+.dashboard-main {
+  background: transparent;
+}
+
+.dashboard-summary-card {
+  border: 1px solid var(--dashboard-border-soft);
+  background: linear-gradient(145deg, oklch(0.13 0.04 265 / 96%), var(--dashboard-surface));
+  box-shadow: 0 1rem 2rem oklch(0.02 0.04 265 / 22%), inset 0 1px 0 oklch(1 0 0 / 4%);
+}
+
+.dashboard-summary-card:nth-child(1) {
+  border-color: oklch(0.62 0.2 265 / 72%);
+}
+
+.dashboard-summary-card:nth-child(2) {
+  border-color: oklch(0.62 0.18 20 / 62%);
+  background: linear-gradient(145deg, oklch(0.16 0.045 20 / 74%), oklch(0.14 0.035 265));
+}
+
+.dashboard-summary-card:nth-child(3) {
+  border-color: oklch(0.63 0.17 155 / 64%);
+  background: linear-gradient(145deg, oklch(0.14 0.055 155 / 74%), oklch(0.13 0.04 265));
+}
+
+.dashboard-summary-icon {
+  background: oklch(0.29 0.12 270 / 55%);
+}
+
+.dashboard-summary-card:nth-child(2) .dashboard-summary-icon {
+  background: oklch(0.32 0.12 20 / 38%);
+  color: var(--dashboard-red);
+}
+
+.dashboard-summary-card:nth-child(3) .dashboard-summary-icon {
+  background: oklch(0.32 0.12 155 / 38%);
+  color: var(--dashboard-green);
+}
+
+.dashboard-debts-section {
+  border-radius: 1rem;
+}
+
+.dashboard-debt-list {
+  border: 1px solid var(--dashboard-border-soft);
+  background: linear-gradient(145deg, oklch(0.12 0.04 265 / 98%), oklch(0.1 0.035 265 / 98%));
+  box-shadow: 0 1rem 2rem oklch(0.02 0.04 265 / 18%);
+}
+
+.dashboard-debt-list > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--dashboard-border-soft);
+}
+
+.dashboard-debt-row {
+  min-height: 5.5rem;
+}
+
+.dashboard-debt-row:hover {
+  background: oklch(0.24 0.07 265 / 22%);
 }
 
 .login-page {
