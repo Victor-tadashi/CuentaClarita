@@ -53,11 +53,11 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="login-page flex min-h-screen items-center justify-center overflow-hidden px-4 py-8 sm:px-6 sm:py-12">
+    <main className="login-page flex min-h-screen items-center justify-center overflow-hidden px-4 py-5 sm:px-6 sm:py-8">
       <div className="login-orb login-orb-left" aria-hidden="true" />
       <div className="login-orb login-orb-right" aria-hidden="true" />
       <section className="login-content w-full max-w-lg">
-        <div className="mb-7 flex flex-col items-center text-center sm:mb-9">
+        <div className="mb-5 flex flex-col items-center text-center sm:mb-6">
           <div className="login-brand-frame">
             <Image
               src="/brand/cuenta-clarita.png"
@@ -69,19 +69,19 @@ export default function LoginPage() {
             />
           </div>
           <h1 className="sr-only">CuentaClarita</h1>
-          <p className="mt-5 text-base text-muted-foreground sm:text-lg">
+          <p className="mt-3 text-base text-muted-foreground sm:text-lg">
             {registering ? 'Crea tu cuenta para ordenar tus finanzas.' : 'Tus finanzas claras, mes a mes.'}
           </p>
         </div>
 
         <div className="login-card rounded-[1.5rem] p-5 sm:p-8">
-          <div className="mb-7 flex items-center gap-4">
+          <div className="mb-5 flex items-center gap-4">
             <span className="login-icon flex size-12 shrink-0 items-center justify-center rounded-2xl">
               {registering ? <UserPlus className="size-6" /> : <LogIn className="size-6" />}
             </span>
             <div>
               <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">{registering ? 'Crear cuenta' : 'Iniciar sesión'}</h2>
-              <p className="mt-1 text-sm text-muted-foreground sm:text-base">Acceso seguro con Supabase.</p>
+              <p className="mt-1 text-sm text-foreground/70 sm:text-base">Acceso seguro con Supabase.</p>
             </div>
           </div>
 
@@ -127,7 +127,7 @@ export default function LoginPage() {
             </button>
           </p>
         </div>
-        <p className="login-security-note mt-7 flex items-center justify-center text-center text-xs leading-relaxed text-muted-foreground sm:text-sm">
+        <p className="login-security-note mt-5 flex items-center justify-center text-center text-xs leading-relaxed text-muted-foreground sm:text-sm">
           <ShieldCheck className="mr-2 size-5 shrink-0 text-primary" aria-hidden="true" />
           <span>Tu acceso está protegido y listo para sincronizar tus finanzas.</span>
         </p>

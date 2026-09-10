@@ -98,14 +98,14 @@
   --login-logo-background: oklch(0.98 0.005 270);
   --login-accent: oklch(0.72 0.2 285);
   --login-border: oklch(0.7 0.16 275 / 38%);
-  --login-border-strong: oklch(0.72 0.2 275 / 56%);
+  --login-border-strong: oklch(0.68 0.08 270 / 34%);
   --login-highlight: oklch(0.9 0.1 275 / 14%);
   --login-shadow: oklch(0.03 0.04 270 / 58%);
   --login-icon-background: oklch(0.3 0.14 280 / 54%);
   --login-focus-ring: oklch(0.72 0.2 285 / 28%);
   --login-placeholder: oklch(0.76 0.04 275);
   --login-button: linear-gradient(105deg, oklch(0.68 0.21 285), oklch(0.59 0.2 265));
-  --login-button-shadow: oklch(0.5 0.18 285 / 38%);
+  --login-button-shadow: oklch(0.45 0.12 275 / 22%);
   --login-orb: oklch(0.35 0.24 270 / 35%);
 
   --chart-1: oklch(0.63 0.19 285);
@@ -153,12 +153,12 @@
   border: 1px solid var(--login-border);
   border-radius: 1.25rem;
   background: oklch(0.12 0.04 270 / 72%);
-  padding: 0.75rem;
-  box-shadow: 0 1rem 3rem var(--login-shadow), inset 0 1px 0 var(--login-highlight);
+  padding: 0.5rem;
+  box-shadow: 0 0.75rem 2rem var(--login-shadow), inset 0 1px 0 var(--login-highlight);
 }
 
 .login-brand-image {
-  height: 6.5rem;
+  height: 5.5rem;
   width: min(100%, 15rem);
   border-radius: 0.75rem;
   background: var(--login-logo-background);
@@ -169,7 +169,7 @@
 .login-card {
   border: 1px solid var(--login-border-strong);
   background: var(--login-panel);
-  box-shadow: 0 1.5rem 4rem var(--login-shadow), inset 0 1px 0 var(--login-highlight);
+  box-shadow: 0 1.25rem 3rem var(--login-shadow), inset 0 1px 0 var(--login-highlight);
   backdrop-filter: blur(1rem);
 }
 
@@ -244,7 +244,7 @@
 .login-submit:hover:not(:disabled) {
   filter: brightness(1.08);
   transform: translateY(-1px);
-  box-shadow: 0 1rem 2rem var(--login-button-shadow);
+  box-shadow: 0 0.75rem 1.25rem var(--login-button-shadow);
 }
 
 .login-submit:disabled {
@@ -279,11 +279,12 @@
 
 @media (max-width: 640px) {
   .login-brand-image {
-    height: 5.5rem;
+    height: 4.75rem;
   }
 
   .login-card {
     border-radius: 1.25rem;
+    padding: 1.25rem;
   }
 }
 
