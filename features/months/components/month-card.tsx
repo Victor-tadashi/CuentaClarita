@@ -20,7 +20,7 @@ export function MonthCard({
   const isActive = month.status === 'active'
 
   return (
-    <div className="flex flex-col gap-4 rounded-2xl bg-card p-5 ring-1 ring-foreground/10">
+    <div className="dashboard-month-card flex flex-col gap-4 rounded-2xl p-5">
       <div className="flex items-start justify-between gap-2">
         <div>
           <p className="text-base font-semibold leading-tight">
