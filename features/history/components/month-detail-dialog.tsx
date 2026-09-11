@@ -38,11 +38,11 @@ export function MonthDetailDialog({
             </DialogHeader>
 
             <div className="grid grid-cols-3 gap-2">
-              <div className="rounded-xl bg-accent/40 p-3">
+              <div className="modal-summary-card rounded-xl p-3">
                 <p className="text-xs text-muted-foreground">Sueldo</p>
                 <Amount value={summary.salary} className="text-sm font-medium" />
               </div>
-              <div className="rounded-xl bg-accent/40 p-3">
+              <div className="modal-summary-card rounded-xl p-3">
                 <p className="text-xs text-muted-foreground">Deudas</p>
                 <Amount
                   value={summary.totalDebts}
@@ -69,7 +69,7 @@ export function MonthDetailDialog({
                   Este mes no tiene deudas registradas.
                 </p>
               ) : (
-                <div className="max-h-64 overflow-y-auto">
+                <div className="modal-debt-scroll max-h-64 overflow-y-auto">
                   <DebtList debts={debts} />
                 </div>
               )}

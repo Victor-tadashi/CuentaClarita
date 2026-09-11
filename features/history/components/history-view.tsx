@@ -53,7 +53,7 @@ export function HistoryView() {
                 <div className="h-px flex-1 bg-border" />
               </div>
 
-              <ul className="divide-y divide-border overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10">
+              <ul className="dashboard-history-list divide-y overflow-hidden rounded-2xl">
                 {groups.get(year)!.map((month) => {
                   const summary = getMonthSummary(month.id)
                   return (
@@ -61,7 +61,7 @@ export function HistoryView() {
                       <button
                         type="button"
                         onClick={() => setSelected(month)}
-                        className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-accent/40"
+                        className="dashboard-history-row flex w-full items-center gap-4 px-5 py-4 text-left transition-colors hover:bg-accent/20"
                       >
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2">

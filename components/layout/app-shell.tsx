@@ -26,7 +26,7 @@ function Brand() {
         alt="CuentaClarita — tus finanzas, siempre claras"
         width={220}
         height={92}
-        className="h-11 w-[10.5rem] rounded-md bg-card object-contain p-0.5"
+        className="dashboard-brand-image h-11 w-[10.5rem] rounded-md object-contain p-0.5"
         priority
       />
     </Link>
@@ -47,7 +47,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="dashboard-shell min-h-screen md:flex">
       {/* Sidebar — escritorio */}
       <aside className="dashboard-sidebar sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r px-4 py-5 md:flex">
-        <div className="px-2">
+        <div className="dashboard-brand-frame px-2">
           <Brand />
         </div>
         <nav className="mt-8 flex flex-col gap-1">
