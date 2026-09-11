@@ -1,33 +1,98 @@
-# CuentaClarita
+# CuentaClarita 💰
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [v0](https://v0.app).
+Control de sueldo y deudas mensuales, simple y en español.
 
-## Built with v0
+CuentaClarita es una app web para llevar el control de tu sueldo, tus deudas y cuánto dinero te queda disponible cada mes, sin planillas complicadas.
 
-This repository is linked to a [v0](https://v0.app) project. You can continue developing by visiting the link below -- start new chats to make changes, and v0 will push commits directly to this repo. Every merge to `main` will automatically deploy.
+## Funcionalidades
 
-[Continue working on v0 →](https://v0.app/chat/projects/prj_fA91DmUF6iXSjacfkFe5iGW6tmNB)
+- **Dashboard mensual**: resumen del sueldo, total de deudas y disponible del mes, de un vistazo.
+- **Administrar meses**: crea y edita meses, registra tu sueldo y agrega o elimina deudas asociadas.
+- **Historial**: revisa meses anteriores y cómo evolucionaron tus finanzas.
+- **Autenticación segura**: registro e inicio de sesión con Supabase Auth, protegido con rate limiting.
+- **Datos aislados por usuario**: cada persona solo ve y edita su propia información, reforzado con Row Level Security (RLS) en la base de datos.
 
-## Getting Started
+## Stack técnico
 
-First, run the development server:
+- [Next.js](https://nextjs.org/) (App Router)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Tailwind CSS](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/)
+- [Supabase](https://supabase.com/) — autenticación, base de datos Postgres, RLS y funciones RPC
+- Desplegado en [Vercel](https://vercel.com/)
+
+## Empezando
+
+### Requisitos
+
+- Node.js 18+
+- Una cuenta y proyecto en [Supabase](https://supabase.com/)
+
+### Instalación
+
+```bash
+git clone https://github.com/Victor-tadashi/CuentaClarita.git
+cd CuentaClarita
+npm install
+```
+
+### Variables de entorno
+
+Crea un archivo `.env.local` en la raíz del proyecto con:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+```
+
+⚠️ `SUPABASE_SERVICE_ROLE_KEY` tiene privilegios administrativos y **nunca** debe exponerse al cliente — se usa exclusivamente en rutas de servidor (`app/api/`).
+
+### Base de datos
+
+El esquema está versionado en `supabase/migrations/`. Para aplicarlo a tu propio proyecto de Supabase:
+
+```bash
+supabase db push
+```
+
+Esto crea las tablas `months` y `debts`, sus políticas de RLS y las funciones RPC (`create_month_with_debts`, `delete_month_with_debts`).
+
+### Correr en desarrollo
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abre [http://localhost:3000](http://localhost:3000) para ver la app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Estructura del proyecto
 
-## Learn More
+```
+app/
+  api/auth/       # Endpoints de registro/login (server-side)
+  dashboard/      # Vista principal: resumen del mes
+  meses/          # Administrar meses
+  historial/      # Historial de meses anteriores
+  login/          # Autenticación
+supabase/
+  migrations/     # Esquema versionado de la base de datos
+```
 
-To learn more, take a look at the following resources:
+## Seguridad
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [v0 Documentation](https://v0.app/docs) - learn about v0 and how to use it.
+- Row Level Security (RLS) habilitado en todas las tablas, con políticas filtradas por usuario autenticado.
+- Rate limiting en el endpoint de registro.
+- Headers de seguridad configurados en `next.config.mjs`.
+- La service role key de Supabase se usa exclusivamente en rutas server-side, nunca en el cliente.
+
+## Despliegue
+
+La app está desplegada en Vercel: [cuentaclarita.vercel.app](https://cuentaclarita.vercel.app)
+
+Cada merge a `main` se despliega automáticamente.
+
+## Desarrollado con v0
+
+Este proyecto nació como un proyecto de [v0](https://v0.app/). Puedes seguir desarrollándolo desde ahí — cada chat nuevo en v0 empuja los commits directamente a este repositorio:
+
+[Continuar en v0 →](https://v0.app/chat/projects/prj_fA91DmUF6iXSjacfkFe5iGW6tmNB)
