@@ -1,6 +1,7 @@
 'use client'
 
 import { Trash2 } from 'lucide-react'
+import { getCalendarMonthStatus } from '@/features/store/finance-provider'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Amount } from '@/features/shared/components/amount'
@@ -12,15 +13,30 @@ export function MonthCard({
   month,
   summary,
   onDelete,
+  onOpen,
 }: {
   month: Month
   summary: MonthSummary
   onDelete: () => void
+  onOpen: () => void
 }) {
-  const isActive = month.status === 'active'
+  const calendarStatus = getCalendarMonthStatus(month)
+  const statusLabel = calendarStatus === 'current' ? 'Mes activo' : calendarStatus === 'future' ? 'Próximo' : 'Finalizado'
+  const isActive = calendarStatus === 'current'
 
   return (
-    <div className="dashboard-month-card flex flex-col gap-4 rounded-2xl p-5">
+    <div
+      className="dashboard-month-card flex cursor-pointer flex-col gap-4 rounded-2xl p-5"
+      role="button"
+      tabIndex={0}
+      onClick={onOpen}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          onOpen()
+        }
+      }}
+    >
       <div className="flex items-start justify-between gap-2">
         <div>
           <p className="text-base font-semibold leading-tight">
@@ -33,14 +49,17 @@ export function MonthCard({
             {isActive ? (
               <span className="size-1.5 rounded-full bg-primary-foreground" />
             ) : null}
-            {isActive ? 'Mes activo' : 'Finalizado'}
+            {statusLabel}
           </Badge>
           <Button
             variant="ghost"
             size="icon-sm"
             aria-label={`Eliminar ${monthName(month.month)} ${month.year}`}
             className="text-muted-foreground hover:text-negative"
-            onClick={onDelete}
+            onClick={(event) => {
+              event.stopPropagation()
+              onDelete()
+            }}
           >
             <Trash2 />
           </Button>

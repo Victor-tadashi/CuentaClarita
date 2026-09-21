@@ -46,6 +46,40 @@ function compareMonthsDesc(a: Month, b: Month) {
   return b.month - a.month
 }
 
+function getCalendarCurrentPeriod(date = new Date()) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Santiago',
+    year: 'numeric',
+    month: '2-digit',
+  }).formatToParts(date)
+  const year = Number(parts.find((part) => part.type === 'year')?.value)
+  const month = Number(parts.find((part) => part.type === 'month')?.value)
+  return { year, month }
+}
+
+function compareMonthToPeriod(month: Month, period: { year: number; month: number }) {
+  if (month.year !== period.year) return month.year - period.year
+  return month.month - period.month
+}
+
+export type CalendarMonthStatus = 'current' | 'future' | 'finished'
+
+export function getCalendarMonthStatus(month: Month, date = new Date()): CalendarMonthStatus {
+  const period = getCalendarCurrentPeriod(date)
+  const comparison = compareMonthToPeriod(month, period)
+  if (comparison === 0) return 'current'
+  return comparison > 0 ? 'future' : 'finished'
+}
+
+function selectCalendarMonth(months: Month[]) {
+  const period = getCalendarCurrentPeriod()
+  return months.find((month) => compareMonthToPeriod(month, period) === 0)
+    ?? [...months]
+      .filter((month) => compareMonthToPeriod(month, period) < 0)
+      .sort(compareMonthsDesc)[0]
+    ?? null
+}
+
 function isJwtTimingError(error: unknown) {
   const value = error as { code?: string; message?: string } | null
   const message = value?.message?.toLowerCase() ?? ''
@@ -201,8 +235,7 @@ export function FinanceProvider({
 
   const value = React.useMemo<FinanceContextValue>(() => {
     const sortedMonths = [...data.months].sort(compareMonthsDesc)
-    const activeMonth =
-      data.months.find((m) => m.status === 'active') ?? null
+    const activeMonth = selectCalendarMonth(data.months)
 
     const getMonth = (monthId: string) =>
       data.months.find((m) => m.id === monthId)
