@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Plus, CalendarDays } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -14,6 +15,7 @@ import { MonthCard } from '@/features/months/components/month-card'
 import type { Month } from '@/features/months/types'
 
 export function MonthsView() {
+  const router = useRouter()
   const { loaded, loadingError, loadingMessage, retryLoad, sortedMonths, getMonthSummary, deleteMonth, syncError, retrySync } = useFinance()
   const [pendingDelete, setPendingDelete] = React.useState<Month | null>(null)
 
@@ -68,6 +70,7 @@ export function MonthsView() {
               month={month}
               summary={getMonthSummary(month.id)}
               onDelete={() => setPendingDelete(month)}
+              onOpen={() => router.push(`/?monthId=${encodeURIComponent(month.id)}`)}
             />
           ))}
         </div>

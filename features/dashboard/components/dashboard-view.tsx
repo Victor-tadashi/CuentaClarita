@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { Plus, Pencil, PartyPopper, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -20,12 +21,15 @@ import type { Debt, DebtInput } from '@/features/debts/types'
 
 export function DashboardView() {
   const { user } = useAuth()
+  const searchParams = useSearchParams()
+  const selectedMonthId = searchParams.get('monthId')
   const {
     loaded,
     loadingError,
     loadingMessage,
     retryLoad,
     activeMonth,
+    getMonth,
     getMonthDebts,
     getMonthSummary,
     updateSalary,
@@ -47,7 +51,9 @@ export function DashboardView() {
     return <div className="flex min-h-48 flex-col items-center justify-center gap-3 text-center"><p className="text-sm text-destructive">{loadingError}</p><Button variant="outline" onClick={retryLoad}>Reintentar</Button></div>
   }
 
-  if (!activeMonth) {
+  const viewingMonth = selectedMonthId ? getMonth(selectedMonthId) ?? activeMonth : activeMonth
+
+  if (!viewingMonth) {
     return (
       <>
         <PageHeader title="Dashboard" />
@@ -69,8 +75,10 @@ export function DashboardView() {
     )
   }
 
-  const debts = getMonthDebts(activeMonth.id)
-  const summary = getMonthSummary(activeMonth.id)
+  const debts = getMonthDebts(viewingMonth.id)
+  const summary = getMonthSummary(viewingMonth.id)
+
+  const isViewingSelectedMonth = viewingMonth.id !== activeMonth?.id
 
   const openCreate = () => {
     setEditing(null)
@@ -87,7 +95,7 @@ export function DashboardView() {
         await updateDebt(editing.id, input)
         toast.success('Deuda actualizada.')
       } else {
-        await addDebt(activeMonth.id, input)
+        await addDebt(viewingMonth.id, input)
         toast.success('Deuda agregada.')
       }
     } catch {
@@ -98,13 +106,13 @@ export function DashboardView() {
   return (
     <>
       <PageHeader
-        title={monthLabel(activeMonth.month, activeMonth.year)}
-        description={`Hola, ${user?.name ?? 'de nuevo'}. Este es tu mes activo.`}
+        title={monthLabel(viewingMonth.month, viewingMonth.year)}
+        description={`Hola, ${user?.name ?? 'de nuevo'}. ${isViewingSelectedMonth ? 'Estás revisando este mes.' : 'Este es tu mes activo.'}`}
         action={
           <div className="flex items-center gap-2">
             <Badge variant="secondary" className="gap-1">
               <span className="size-1.5 rounded-full bg-positive" />
-              Mes activo
+              {isViewingSelectedMonth ? 'Mes en revisión' : 'Mes activo'}
             </Badge>
             <Button
               variant="outline"
@@ -165,10 +173,10 @@ export function DashboardView() {
       <SalaryDialog
         open={salaryOpen}
         onOpenChange={setSalaryOpen}
-        initialSalary={activeMonth.salary}
+        initialSalary={viewingMonth.salary}
           onSave={async (salary) => {
           try {
-            await updateSalary(activeMonth.id, salary)
+            await updateSalary(viewingMonth.id, salary)
             toast.success('Sueldo actualizado.')
           } catch {
             // El estado persistente de error informa al usuario y permite reintentar.

@@ -62,6 +62,15 @@ function compareMonthToPeriod(month: Month, period: { year: number; month: numbe
   return month.month - period.month
 }
 
+export type CalendarMonthStatus = 'current' | 'future' | 'finished'
+
+export function getCalendarMonthStatus(month: Month, date = new Date()): CalendarMonthStatus {
+  const period = getCalendarCurrentPeriod(date)
+  const comparison = compareMonthToPeriod(month, period)
+  if (comparison === 0) return 'current'
+  return comparison > 0 ? 'future' : 'finished'
+}
+
 function selectCalendarMonth(months: Month[]) {
   const period = getCalendarCurrentPeriod()
   return months.find((month) => compareMonthToPeriod(month, period) === 0)
