@@ -1,33 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-
-const REGISTRATION_WINDOW_MS = 10 * 60 * 1000
-const MAX_REGISTRATION_ATTEMPTS = 5
-const registrationAttempts = new Map<string, number[]>()
-
-function getClientIp(request: Request) {
-  const forwardedFor = request.headers.get('x-forwarded-for')
-  const realIp = request.headers.get('x-real-ip')
-  const connectingIp = request.headers.get('cf-connecting-ip')
-
-  return forwardedFor?.split(',')[0]?.trim() || realIp || connectingIp || 'unknown'
-}
-
-function isRateLimited(ip: string) {
-  const now = Date.now()
-  const recentAttempts = (registrationAttempts.get(ip) ?? []).filter(
-    (timestamp) => now - timestamp < REGISTRATION_WINDOW_MS,
-  )
-
-  if (recentAttempts.length >= MAX_REGISTRATION_ATTEMPTS) {
-    registrationAttempts.set(ip, recentAttempts)
-    return true
-  }
-
-  recentAttempts.push(now)
-  registrationAttempts.set(ip, recentAttempts)
-  return false
-}
+import { AUTH_RATE_LIMIT_MESSAGE, getClientIp, isAuthRateLimited } from '@/lib/auth-rate-limit'
 
 function getSupabaseAdmin() {
   const url = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -61,9 +34,9 @@ function getRegistrationMessage(error: { code?: string; message?: string }) {
 export async function POST(request: Request) {
   const clientIp = getClientIp(request)
 
-  if (isRateLimited(clientIp)) {
+  if (isAuthRateLimited(clientIp)) {
     return NextResponse.json(
-      { ok: false, message: 'Demasiados intentos, espera unos minutos e inténtalo nuevamente.' },
+      { ok: false, message: AUTH_RATE_LIMIT_MESSAGE },
       { status: 429 },
     )
   }
