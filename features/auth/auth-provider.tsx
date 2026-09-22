@@ -63,9 +63,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const value = React.useMemo<AuthContextValue>(() => ({ user, loaded,
     async signIn(email, password) {
       if (!supabase) return { ok: false, message: 'El servicio de autenticación no está disponible.' }
-      const { error } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password })
-      if (error) return { ok: false, message: 'Correo o contraseña incorrectos.' }
-      router.replace('/'); return { ok: true }
+      try {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        })
+        const result = await response.json().catch(() => null)
+        if (!response.ok || !result?.ok || !result.session) {
+          return { ok: false, message: result?.message ?? 'Correo o contraseña incorrectos.' }
+        }
+        const { error } = await supabase.auth.setSession(result.session)
+        if (error) return { ok: false, message: 'No pudimos iniciar sesión. Inténtalo nuevamente.' }
+        router.replace('/')
+        return { ok: true }
+      } catch {
+        return { ok: false, message: 'No pudimos conectar con el servidor. Revisa tu conexión e inténtalo nuevamente.' }
+      }
     },
     async signUp(name, email, password) {
       try {
