@@ -4,6 +4,7 @@ import * as React from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { type AuthChangeEvent, type Session } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
+import { IdleSessionGuard } from './idle-session-guard'
 
 type SessionUser = { id: string; name: string; email: string }
 type AuthContextValue = { user: SessionUser | null; loaded: boolean; signIn: (email: string, password: string) => Promise<{ ok: boolean; message?: string }>; signUp: (name: string, email: string, password: string) => Promise<{ ok: boolean; message?: string }>; signOut: () => Promise<void> }
@@ -40,7 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       invalidSessionHandled.current = true
       setUser(null)
       clearLocalSupabaseStorage()
-      void supabase.auth.signOut().catch(() => undefined)
+      void supabase.auth.signOut({ scope: 'local' }).catch(() => undefined)
     }
 
     supabase.auth.getSession().then(({ data, error }: { data: { session: Session | null }; error: { code?: string; message?: string } | null }) => {
@@ -91,8 +92,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       return { ok: true, message: 'Cuenta creada correctamente. Ahora inicia sesión con tu correo y contraseña.' }
     },
-    async signOut() { await supabase.auth.signOut(); router.replace('/login') },
+    async signOut() {
+      try {
+        if (supabase) {
+          const { error } = await supabase.auth.signOut({ scope: 'local' })
+          if (error) setUser(null)
+        }
+      } catch {
+        setUser(null)
+      } finally {
+        setUser(null)
+        router.replace('/login')
+      }
+    },
   }), [loaded, router, supabase, user])
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+      <IdleSessionGuard
+        enabled={loaded && Boolean(user) && !pathname.startsWith('/login') && !pathname.startsWith('/registro')}
+        userId={user?.id ?? null}
+        onSignOut={value.signOut}
+      />
+    </AuthContext.Provider>
+  )
 }
 export function useAuth() { const context = React.useContext(AuthContext); if (!context) throw new Error('useAuth debe usarse dentro de AuthProvider'); return context }
