@@ -907,6 +907,11 @@
 }
 
 @media (min-width: 1024px) {
+  /* Clip desktop ornaments without creating a nested scroll area. */
+  .login-page {
+    overflow: clip;
+  }
+
   .login-topbar {
     min-height: 6.25rem;
   }
@@ -978,6 +983,12 @@
 
   .login-security-note {
     width: min(100%, 28.125rem);
+  }
+}
+
+@media (min-width: 1024px) and (max-height: 900px) {
+  .login-layout {
+    padding-block: clamp(1rem, 2.5svh, 1.5rem);
   }
 }
 
