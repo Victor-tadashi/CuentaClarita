@@ -16,6 +16,7 @@ export function ConfirmDialog({
   description,
   confirmLabel = 'Eliminar',
   onConfirm,
+  className,
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -23,10 +24,11 @@ export function ConfirmDialog({
   description?: string
   confirmLabel?: string
   onConfirm: () => void
+  className?: string
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className={className}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {description ? (

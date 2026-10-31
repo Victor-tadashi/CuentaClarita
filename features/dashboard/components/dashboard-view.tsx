@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { toast } from 'sonner'
-import { Plus, Pencil, PartyPopper, Sparkles } from 'lucide-react'
+import { Plus, Pencil, PartyPopper, Sparkles, ClipboardList } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { PageHeader } from '@/features/shared/components/page-header'
@@ -49,7 +49,7 @@ export function DashboardView() {
 
   if (!activeMonth) {
     return (
-      <>
+      <div className="dashboard-home-view">
         <PageHeader title="Dashboard" />
         <EmptyState
           icon={Sparkles}
@@ -58,14 +58,14 @@ export function DashboardView() {
           action={
             <CreateMonthWizard
               trigger={
-                <Button size="lg">
-                  <Plus /> Crear mi primer mes
+                <Button size="lg" className="dashboard-home-cta">
+                  <Plus data-icon="inline-start" /> Crear mi primer mes
                 </Button>
               }
             />
           }
         />
-      </>
+      </div>
     )
   }
 
@@ -96,29 +96,35 @@ export function DashboardView() {
   }
 
   return (
-    <>
-      <PageHeader
-        title={monthLabel(activeMonth.month, activeMonth.year)}
-        description={`Hola, ${user?.name ?? 'de nuevo'}. Este es tu mes activo.`}
-        action={
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="gap-1">
-              <span className="size-1.5 rounded-full bg-positive" />
-              Mes activo
-            </Badge>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setSalaryOpen(true)}
-            >
-              <Pencil /> Editar sueldo
-            </Button>
-          </div>
-        }
-      />
+    <div className="dashboard-home-view">
+      <header className="dashboard-home-header">
+        <div className="dashboard-home-heading">
+          <h1 className="dashboard-home-title">
+            {monthLabel(activeMonth.month, activeMonth.year)}
+          </h1>
+          <p className="dashboard-home-greeting">
+            Hola, {user?.name ?? 'de nuevo'}. Este es tu mes activo.
+          </p>
+        </div>
+        <div className="dashboard-home-header-actions">
+          <Badge variant="secondary" className="dashboard-home-status">
+            <span className="dashboard-home-status-dot" aria-hidden="true" />
+            Mes activo
+          </Badge>
+          <Button
+            variant="outline"
+            size="sm"
+            className="dashboard-home-salary-button"
+            onClick={() => setSalaryOpen(true)}
+          >
+            <Pencil data-icon="inline-start" />
+            Editar sueldo
+          </Button>
+        </div>
+      </header>
 
       {syncError ? (
-        <div className="mb-4 flex items-center justify-between gap-3 rounded-lg border border-negative/30 bg-negative/10 p-3 text-sm text-negative" role="alert">
+        <div className="dashboard-home-sync-alert mb-4 flex items-center justify-between gap-3 rounded-lg border border-negative/30 bg-negative/10 p-3 text-sm text-negative" role="alert">
           <span>{syncError}</span>
           <Button variant="outline" size="sm" onClick={retrySync}>Reintentar</Button>
         </div>
@@ -126,18 +132,30 @@ export function DashboardView() {
 
       <SummaryCards summary={summary} />
 
-      <section className="dashboard-debts-section mt-10">
-        <div className="mb-5 flex items-center justify-between gap-4">
-          <h2 className="text-xl font-semibold tracking-tight">
-            Deudas del mes
-            {debts.length > 0 ? (
-              <span className="ml-1.5 text-muted-foreground/70">
-                ({debts.length})
-              </span>
-            ) : null}
-          </h2>
-          <Button size="sm" onClick={openCreate}>
-            <Plus /> Agregar deuda
+      <section className="dashboard-home-debts">
+        <div className="dashboard-home-debts-header">
+          <div className="dashboard-home-debts-heading">
+            <span className="dashboard-home-debts-icon" aria-hidden="true">
+              <ClipboardList className="size-5" />
+            </span>
+            <div className="min-w-0">
+              <h2 className="dashboard-home-debts-title">
+                Deudas del mes
+                <span className="dashboard-home-debt-count">({debts.length})</span>
+              </h2>
+              <p className="dashboard-home-debts-description">
+                Aquí puedes ver y administrar todas tus deudas registradas.
+              </p>
+            </div>
+          </div>
+          <Button
+            size="sm"
+            className="dashboard-home-cta dashboard-home-add-button"
+            aria-label="Agregar deuda"
+            onClick={openCreate}
+          >
+            <Plus data-icon="inline-start" />
+            <span className="dashboard-home-add-label">Agregar deuda</span>
           </Button>
         </div>
 
@@ -147,14 +165,15 @@ export function DashboardView() {
             title="Sin deudas registradas"
             description="Agrega tus deudas de este mes para calcular cuánto dinero te quedará disponible."
             action={
-              <Button onClick={openCreate}>
-                <Plus /> Agregar deuda
+              <Button className="dashboard-home-cta" onClick={openCreate}>
+                <Plus data-icon="inline-start" /> Agregar deuda
               </Button>
             }
           />
         ) : (
           <DebtList
             debts={debts}
+            appearance="dashboard"
             editable
             onEdit={openEdit}
             onDelete={(debt) => setPendingDelete(debt)}
@@ -163,10 +182,11 @@ export function DashboardView() {
       </section>
 
       <SalaryDialog
+        className="dashboard-home-dialog"
         open={salaryOpen}
         onOpenChange={setSalaryOpen}
         initialSalary={activeMonth.salary}
-          onSave={async (salary) => {
+        onSave={async (salary) => {
           try {
             await updateSalary(activeMonth.id, salary)
             toast.success('Sueldo actualizado.')
@@ -177,6 +197,7 @@ export function DashboardView() {
       />
 
       <DebtFormDialog
+        className="dashboard-home-dialog"
         open={formOpen}
         onOpenChange={setFormOpen}
         mode={editing ? 'edit' : 'create'}
@@ -194,6 +215,7 @@ export function DashboardView() {
       />
 
       <ConfirmDialog
+        className="dashboard-home-dialog"
         open={pendingDelete !== null}
         onOpenChange={(open) => !open && setPendingDelete(null)}
         title="Eliminar deuda"
@@ -213,6 +235,6 @@ export function DashboardView() {
           }
         }}
       />
-    </>
+    </div>
   )
 }

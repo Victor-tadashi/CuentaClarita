@@ -22,12 +22,14 @@ export function DebtFormDialog({
   initialValue,
   onSubmit,
   mode,
+  className,
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
   initialValue?: DebtInput | null
   onSubmit: (value: DebtInput) => void
   mode: 'create' | 'edit'
+  className?: string
 }) {
   const [value, setValue] = React.useState<DebtInput>(EMPTY)
   const [error, setError] = React.useState<string | null>(null)
@@ -61,7 +63,7 @@ export function DebtFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className={className}>
         <DialogHeader>
           <DialogTitle>
             {mode === 'create' ? 'Agregar deuda' : 'Editar deuda'}
