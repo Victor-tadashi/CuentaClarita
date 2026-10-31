@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { toast } from 'sonner'
-import { CalendarDays, Plus, Pencil, PartyPopper, Sparkles } from 'lucide-react'
+import { Plus, Pencil, PartyPopper, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { PageHeader } from '@/features/shared/components/page-header'
@@ -97,38 +97,25 @@ export function DashboardView() {
 
   return (
     <>
-      <header className="dashboard-month-header mb-7 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex min-w-0 items-center gap-4">
-          <span
-            className="dashboard-month-icon flex size-12 shrink-0 items-center justify-center rounded-2xl"
-            aria-hidden="true"
-          >
-            <CalendarDays className="size-6" />
-          </span>
-          <div className="min-w-0">
-            <h1 className="dashboard-month-title text-2xl font-semibold tracking-tight sm:text-3xl">
-              {monthLabel(activeMonth.month, activeMonth.year)}
-            </h1>
-            <p className="mt-1 text-sm text-muted-foreground sm:text-base">
-              Hola, {user?.name ?? 'de nuevo'}. Este es tu mes activo.
-            </p>
+      <PageHeader
+        title={monthLabel(activeMonth.month, activeMonth.year)}
+        description={`Hola, ${user?.name ?? 'de nuevo'}. Este es tu mes activo.`}
+        action={
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="gap-1">
+              <span className="size-1.5 rounded-full bg-positive" />
+              Mes activo
+            </Badge>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSalaryOpen(true)}
+            >
+              <Pencil /> Editar sueldo
+            </Button>
           </div>
-        </div>
-        <div className="flex shrink-0 flex-wrap items-center gap-2">
-          <Badge variant="secondary" className="dashboard-active-badge gap-2">
-            <span className="size-1.5 rounded-full bg-positive" />
-            Mes activo
-          </Badge>
-          <Button
-            variant="outline"
-            size="lg"
-            className="dashboard-edit-salary-button h-10 rounded-xl px-4"
-            onClick={() => setSalaryOpen(true)}
-          >
-            <Pencil /> Editar sueldo
-          </Button>
-        </div>
-      </header>
+        }
+      />
 
       {syncError ? (
         <div className="mb-4 flex items-center justify-between gap-3 rounded-lg border border-negative/30 bg-negative/10 p-3 text-sm text-negative" role="alert">
@@ -140,7 +127,7 @@ export function DashboardView() {
       <SummaryCards summary={summary} />
 
       <section className="dashboard-debts-section mt-10">
-        <div className="dashboard-debt-section-heading mb-5 flex items-center justify-between gap-4">
+        <div className="mb-5 flex items-center justify-between gap-4">
           <h2 className="text-xl font-semibold tracking-tight">
             Deudas del mes
             {debts.length > 0 ? (
@@ -149,11 +136,7 @@ export function DashboardView() {
               </span>
             ) : null}
           </h2>
-          <Button
-            size="lg"
-            className="dashboard-add-debt-button rounded-xl px-4"
-            onClick={openCreate}
-          >
+          <Button size="sm" onClick={openCreate}>
             <Plus /> Agregar deuda
           </Button>
         </div>
@@ -164,11 +147,7 @@ export function DashboardView() {
             title="Sin deudas registradas"
             description="Agrega tus deudas de este mes para calcular cuánto dinero te quedará disponible."
             action={
-              <Button
-                size="lg"
-                className="dashboard-add-debt-button rounded-xl px-4"
-                onClick={openCreate}
-              >
+              <Button onClick={openCreate}>
                 <Plus /> Agregar deuda
               </Button>
             }

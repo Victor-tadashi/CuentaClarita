@@ -3,9 +3,8 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import Image from 'next/image'
-import { LayoutDashboard, CalendarDays, History, LogOut, UserCircle, WalletCards } from 'lucide-react'
+import { LayoutDashboard, CalendarDays, History, LogOut, UserCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { LoginBrandLogo } from '@/features/auth/login-brand-panel'
 import { useAuth } from '@/features/auth/auth-provider'
 
 const NAV_ITEMS = [
@@ -19,28 +18,23 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`)
 }
 
-function Brand({ dashboard = false }: { dashboard?: boolean }) {
+function Brand() {
   return (
     <Link href="/" className="flex items-center" aria-label="CuentaClarita, ir al inicio">
-      {dashboard ? (
-        <LoginBrandLogo className="login-logo-crop dashboard-brand-crop" />
-      ) : (
-        <Image
-          src="/brand/cuenta-clarita.png"
-          alt="CuentaClarita — tus finanzas, siempre claras"
-          width={220}
-          height={92}
-          className="dashboard-brand-image h-11 w-[10.5rem] rounded-md object-contain p-0.5"
-          priority
-        />
-      )}
+      <Image
+        src="/brand/cuenta-clarita.png"
+        alt="CuentaClarita — tus finanzas, siempre claras"
+        width={220}
+        height={92}
+        className="dashboard-brand-image h-11 w-[10.5rem] rounded-md object-contain p-0.5"
+        priority
+      />
     </Link>
   )
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const dashboardRoute = pathname === '/'
   const { user, loaded, signOut } = useAuth()
 
   if (pathname.startsWith('/login') || pathname.startsWith('/registro')) {
@@ -50,14 +44,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   if (!loaded || !user) return null
 
   return (
-    <div
-      className="dashboard-shell min-h-screen md:flex"
-      data-dashboard-page={dashboardRoute ? 'true' : undefined}
-    >
+    <div className="dashboard-shell min-h-screen md:flex">
       {/* Sidebar — escritorio */}
       <aside className="dashboard-sidebar sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r px-4 py-5 md:flex">
         <div className="dashboard-brand-frame px-2">
-          <Brand dashboard={dashboardRoute} />
+          <Brand />
         </div>
         <nav className="mt-8 flex flex-col gap-1">
           {NAV_ITEMS.map((item) => {
@@ -81,18 +72,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           })}
         </nav>
         <div className="mt-auto flex flex-col gap-4">
-          {dashboardRoute ? (
-            <div className="dashboard-info-card flex items-start gap-3 rounded-xl p-3.5">
-              <WalletCards className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" />
-              <p className="text-xs leading-relaxed text-muted-foreground">
-                ¿Cuánto dinero te quedará este mes después de pagar tus deudas?
-              </p>
-            </div>
-          ) : (
-            <p className="px-2.5 text-xs leading-relaxed text-muted-foreground">
-              ¿Cuánto dinero te quedará este mes después de pagar tus deudas?
-            </p>
-          )}
+          <p className="px-2.5 text-xs leading-relaxed text-muted-foreground">
+            ¿Cuánto dinero te quedará este mes después de pagar tus deudas?
+          </p>
           <div className="dashboard-user-card flex items-center justify-between gap-2 rounded-xl p-2.5">
             <div className="flex min-w-0 items-center gap-2">
               <UserCircle className="size-5 shrink-0 text-primary" />
@@ -114,8 +96,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Encabezado — móvil */}
-      <header className="dashboard-mobile-header sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/80 px-4 backdrop-blur-md md:hidden">
-        <Brand dashboard={dashboardRoute} />
+      <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/80 px-4 backdrop-blur-md md:hidden">
+        <Brand />
         <button
           type="button"
           onClick={signOut}
@@ -128,12 +110,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </header>
 
       {/* Contenido */}
-      <main className={cn('dashboard-main flex-1 px-4 pb-24 pt-6 md:px-8 md:pb-10 md:pt-8', dashboardRoute && 'min-w-0')}>
+      <main className="dashboard-main flex-1 px-4 pb-24 pt-6 md:px-8 md:pb-10 md:pt-8">
         <div className="mx-auto w-full max-w-7xl">{children}</div>
       </main>
 
       {/* Navegación inferior — móvil */}
-      <nav className="dashboard-mobile-nav fixed inset-x-0 bottom-0 z-30 grid grid-cols-3 border-t border-border bg-background/90 backdrop-blur-md md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-3 border-t border-border bg-background/90 backdrop-blur-md md:hidden">
         {NAV_ITEMS.map((item) => {
           const active = isActive(pathname, item.href)
           return (
@@ -144,7 +126,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 'flex flex-col items-center gap-1 py-2.5 text-[0.7rem] font-medium transition-colors',
                 active ? 'text-primary' : 'text-muted-foreground',
               )}
-              aria-current={active ? 'page' : undefined}
             >
               <item.icon className="size-5" />
               {item.label === 'Administrar Meses' ? 'Meses' : item.label}
