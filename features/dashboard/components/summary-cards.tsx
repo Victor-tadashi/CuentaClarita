@@ -18,29 +18,30 @@ function StatCard({
   emphasis?: boolean
 }) {
   return (
-    <div
+    <article
       className={cn(
-        'dashboard-summary-card flex flex-col gap-4 rounded-2xl p-6',
+        'dashboard-summary-card flex min-w-0 items-center gap-4 rounded-2xl p-4 sm:p-5',
         emphasis && 'bg-primary/10 ring-primary/20',
       )}
     >
-      <div className="flex items-center justify-between">
-        <span className="text-sm text-muted-foreground">{label}</span>
-        <span
-          className={cn(
-            'dashboard-summary-icon flex size-10 items-center justify-center rounded-xl bg-accent text-muted-foreground',
-            emphasis && 'bg-primary/15 text-primary',
-          )}
-        >
-          <Icon className="size-4" />
-        </span>
+      <span
+        className={cn(
+          'dashboard-summary-icon flex size-12 shrink-0 items-center justify-center rounded-full bg-accent text-primary sm:size-14',
+          emphasis && 'bg-primary/15 text-primary',
+        )}
+        aria-hidden="true"
+      >
+        <Icon className="size-5" />
+      </span>
+      <div className="min-w-0">
+        <p className="text-sm text-muted-foreground">{label}</p>
+        <Amount
+          value={value}
+          tone={tone}
+          className="mt-1 block text-[clamp(1.25rem,2.4vw,2rem)] font-semibold leading-tight"
+        />
       </div>
-      <Amount
-        value={value}
-        tone={tone}
-        className="text-3xl font-semibold tracking-tight sm:text-[2rem]"
-      />
-    </div>
+    </article>
   )
 }
 
@@ -48,7 +49,7 @@ export function SummaryCards({ summary }: { summary: MonthSummary }) {
   const availableTone = summary.available < 0 ? 'negative' : 'positive'
 
   return (
-    <div className="grid gap-4 sm:grid-cols-3">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <StatCard label="Sueldo" value={summary.salary} icon={Wallet} />
       <StatCard
         label="Total de deudas"
