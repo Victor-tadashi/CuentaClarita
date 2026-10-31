@@ -44,11 +44,10 @@ export function DebtList({
             <Amount value={debt.amount} className="text-sm font-medium" />
 
             {editable ? (
-              <div className="dashboard-debt-actions flex items-center gap-1.5">
+              <div className="flex items-center gap-0.5">
                 <Button
                   variant="ghost"
                   size="icon-sm"
-                  className="dashboard-debt-action"
                   aria-label={`Editar ${debt.name}`}
                   onClick={() => onEdit?.(debt)}
                 >
@@ -58,7 +57,7 @@ export function DebtList({
                   variant="ghost"
                   size="icon-sm"
                   aria-label={`Eliminar ${debt.name}`}
-                  className="dashboard-debt-action dashboard-debt-delete text-muted-foreground hover:text-negative"
+                  className="text-muted-foreground hover:text-negative"
                   onClick={() => onDelete?.(debt)}
                 >
                   <Trash2 />
