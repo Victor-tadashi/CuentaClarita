@@ -982,6 +982,16 @@
 }
 
 @media (max-width: 639px) {
+  /* Keep decorative arcs out of the mobile scrollable area. */
+  .login-page {
+    overflow-x: clip;
+    overflow-y: visible;
+  }
+
+  .login-orb {
+    position: fixed;
+  }
+
   .login-brand {
     gap: 0.65rem;
   }
