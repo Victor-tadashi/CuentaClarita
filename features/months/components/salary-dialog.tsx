@@ -17,11 +17,13 @@ export function SalaryDialog({
   onOpenChange,
   initialSalary,
   onSave,
+  className,
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
   initialSalary: number
   onSave: (salary: number) => void
+  className?: string
 }) {
   const [salary, setSalary] = React.useState(initialSalary)
 
@@ -31,7 +33,7 @@ export function SalaryDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className={className}>
         <DialogHeader>
           <DialogTitle>Editar sueldo</DialogTitle>
           <DialogDescription>

@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import Image from 'next/image'
-import { LayoutDashboard, CalendarDays, History, LogOut, UserCircle } from 'lucide-react'
+import { LayoutDashboard, CalendarDays, History, LogOut, UserCircle, TrendingUp } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/features/auth/auth-provider'
 
@@ -18,7 +18,27 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`)
 }
 
-function Brand() {
+function Brand({ dashboard = false }: { dashboard?: boolean }) {
+  if (dashboard) {
+    return (
+      <Link href="/" className="dashboard-home-brand" aria-label="CuentaClarita, ir al inicio">
+        <span className="dashboard-home-brand-mark" aria-hidden="true">
+          <Image
+            src="/brand/cuenta-clarita.png"
+            alt=""
+            width={193}
+            height={129}
+            className="dashboard-home-brand-crop"
+            priority
+          />
+        </span>
+        <span className="dashboard-home-brand-name">
+          Cuenta<span>Clarita</span>
+        </span>
+      </Link>
+    )
+  }
+
   return (
     <Link href="/" className="flex items-center" aria-label="CuentaClarita, ir al inicio">
       <Image
@@ -35,6 +55,7 @@ function Brand() {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const isDashboard = pathname === '/'
   const { user, loaded, signOut } = useAuth()
 
   if (pathname.startsWith('/login') || pathname.startsWith('/registro')) {
@@ -44,11 +65,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   if (!loaded || !user) return null
 
   return (
-    <div className="dashboard-shell min-h-screen md:flex">
+    <div className={cn('dashboard-shell min-h-screen md:flex', isDashboard && 'dashboard-home-shell')}>
       {/* Sidebar — escritorio */}
       <aside className="dashboard-sidebar sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r px-4 py-5 md:flex">
         <div className="dashboard-brand-frame px-2">
-          <Brand />
+          <Brand dashboard={isDashboard} />
         </div>
         <nav className="mt-8 flex flex-col gap-1">
           {NAV_ITEMS.map((item) => {
@@ -72,9 +93,25 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           })}
         </nav>
         <div className="mt-auto flex flex-col gap-4">
-          <p className="px-2.5 text-xs leading-relaxed text-muted-foreground">
-            ¿Cuánto dinero te quedará este mes después de pagar tus deudas?
-          </p>
+          {isDashboard ? (
+            <div className="dashboard-home-sidebar-note">
+              <span className="dashboard-home-sidebar-note-icon" aria-hidden="true">
+                <TrendingUp className="size-5" />
+              </span>
+              <p className="dashboard-home-sidebar-note-title">
+                Tus finanzas
+                <br />
+                <strong>más simples</strong>
+              </p>
+              <p className="dashboard-home-sidebar-note-copy">
+                Organiza, controla y alcanza tus metas.
+              </p>
+            </div>
+          ) : (
+            <p className="px-2.5 text-xs leading-relaxed text-muted-foreground">
+              ¿Cuánto dinero te quedará este mes después de pagar tus deudas?
+            </p>
+          )}
           <div className="dashboard-user-card flex items-center justify-between gap-2 rounded-xl p-2.5">
             <div className="flex min-w-0 items-center gap-2">
               <UserCircle className="size-5 shrink-0 text-primary" />
@@ -97,7 +134,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Encabezado — móvil */}
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/80 px-4 backdrop-blur-md md:hidden">
-        <Brand />
+        <Brand dashboard={isDashboard} />
         <button
           type="button"
           onClick={signOut}
@@ -122,6 +159,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Link
               key={item.href}
               href={item.href}
+              aria-current={isDashboard && active ? 'page' : undefined}
               className={cn(
                 'flex flex-col items-center gap-1 py-2.5 text-[0.7rem] font-medium transition-colors',
                 active ? 'text-primary' : 'text-muted-foreground',
