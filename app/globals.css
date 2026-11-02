@@ -1658,6 +1658,351 @@
   }
 }
 
+.months-summary-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.months-summary-card {
+  display: flex;
+  min-width: 0;
+  min-height: 5rem;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--dashboard-border-soft);
+  border-radius: 1.1rem;
+  background: linear-gradient(145deg, oklch(0.13 0.04 265 / 96%), var(--dashboard-surface));
+  box-shadow: 0 0.8rem 1.8rem oklch(0.02 0.04 265 / 18%), inset 0 1px 0 oklch(1 0 0 / 4%);
+  backdrop-filter: blur(12px);
+}
+
+.months-summary-card:nth-child(1) {
+  border-color: oklch(0.62 0.2 265 / 50%);
+}
+
+.months-summary-card:nth-child(2) {
+  border-color: oklch(0.72 0.19 155 / 48%);
+  background: linear-gradient(145deg, oklch(0.15 0.05 155 / 42%), var(--dashboard-surface));
+}
+
+.months-summary-card:nth-child(3) {
+  border-color: oklch(0.67 0.19 285 / 48%);
+  background: linear-gradient(145deg, oklch(0.16 0.055 285 / 42%), var(--dashboard-surface));
+}
+
+.months-summary-icon {
+  display: flex;
+  width: 2.8rem;
+  height: 2.8rem;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid oklch(0.65 0.15 265 / 16%);
+  border-radius: 0.95rem;
+  background: oklch(0.29 0.12 265 / 35%);
+  color: var(--dashboard-blue);
+}
+
+.months-summary-card:nth-child(2) .months-summary-icon {
+  border-color: oklch(0.72 0.19 155 / 16%);
+  background: oklch(0.31 0.11 155 / 26%);
+  color: var(--dashboard-green);
+}
+
+.months-summary-card:nth-child(3) .months-summary-icon {
+  border-color: oklch(0.67 0.19 285 / 18%);
+  background: oklch(0.32 0.13 285 / 28%);
+  color: var(--primary);
+}
+
+.months-summary-label {
+  color: var(--muted-foreground);
+  font-size: 0.76rem;
+  font-weight: 500;
+}
+
+.months-summary-value {
+  display: block;
+  margin-top: 0.2rem;
+  overflow-wrap: anywhere;
+  color: var(--foreground);
+  font-size: clamp(1.1rem, 1.5vw, 1.35rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+.months-summary-card:nth-child(2) .months-summary-value {
+  font-size: clamp(0.95rem, 1.25vw, 1.12rem);
+}
+
+.months-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: 0.875rem;
+}
+
+.months-view .dashboard-month-card {
+  border-radius: 1.15rem;
+  background: linear-gradient(145deg, oklch(0.13 0.04 265 / 98%), oklch(0.1 0.035 265 / 98%));
+}
+
+.months-view .dashboard-month-card[data-active='true'] {
+  border-color: oklch(0.7 0.18 285 / 88%);
+  background:
+    radial-gradient(ellipse at 100% 0%, oklch(0.4 0.16 285 / 15%), transparent 65%),
+    linear-gradient(145deg, oklch(0.16 0.055 275 / 98%), oklch(0.11 0.045 265 / 98%));
+  box-shadow: 0 0 0 1px oklch(0.7 0.18 285 / 35%), 0 1rem 2rem oklch(0.02 0.04 265 / 24%), inset 0 1px 0 oklch(1 0 0 / 5%);
+}
+
+.month-card-icon {
+  display: flex;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid oklch(0.62 0.16 265 / 18%);
+  border-radius: 0.85rem;
+  background: oklch(0.3 0.12 265 / 35%);
+  color: var(--dashboard-blue);
+}
+
+.months-view .dashboard-month-card[data-active='true'] .month-card-icon {
+  border-color: oklch(0.7 0.18 285 / 24%);
+  background: oklch(0.34 0.15 285 / 34%);
+  color: var(--primary);
+}
+
+.month-card-badge[data-status='active'] {
+  border-color: oklch(0.77 0.14 285 / 22%);
+  background: linear-gradient(110deg, oklch(0.54 0.19 285), oklch(0.44 0.17 265));
+  color: #fff;
+}
+
+.month-card-badge[data-status='future'] {
+  border-color: oklch(0.62 0.06 265 / 24%);
+  background: oklch(0.28 0.035 265 / 80%);
+  color: oklch(0.88 0.025 265);
+}
+
+.month-card-badge[data-status='finished'] {
+  border-color: oklch(0.62 0.06 265 / 20%);
+  background: oklch(0.23 0.025 265 / 80%);
+  color: oklch(0.78 0.025 265);
+}
+
+.months-editor-dialog {
+  max-height: calc(100dvh - 1.5rem);
+  border: 1px solid var(--dashboard-border);
+  border-radius: 1.35rem;
+  background:
+    radial-gradient(ellipse at 100% 0%, oklch(0.34 0.14 275 / 16%), transparent 20rem),
+    linear-gradient(145deg, oklch(0.17 0.055 265 / 99%), oklch(0.1 0.04 265 / 99%));
+  box-shadow: 0 1.5rem 4rem oklch(0.02 0.04 265 / 58%), inset 0 1px 0 oklch(1 0 0 / 4%);
+}
+
+.months-editor-dialog [data-slot='dialog-title'] {
+  font-size: 1.25rem;
+  font-weight: 650;
+  letter-spacing: -0.03em;
+}
+
+.months-editor-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.875rem;
+  padding-right: 2rem;
+}
+
+.months-editor-title-icon {
+  display: flex;
+  width: 2.8rem;
+  height: 2.8rem;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid oklch(0.7 0.16 285 / 20%);
+  border-radius: 0.95rem;
+  background: oklch(0.33 0.14 285 / 32%);
+  color: var(--primary);
+}
+
+.months-editor-summary-card {
+  min-width: 0;
+  padding: 0.9rem;
+  border: 1px solid var(--dashboard-border-soft);
+  border-radius: 1rem;
+  background: linear-gradient(145deg, oklch(0.15 0.05 265 / 88%), oklch(0.12 0.04 265 / 92%));
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 3%);
+}
+
+.months-editor-summary-card:nth-child(1) {
+  border-color: oklch(0.62 0.2 265 / 35%);
+}
+
+.months-editor-summary-card:nth-child(2) {
+  border-color: oklch(0.66 0.19 20 / 32%);
+}
+
+.months-editor-summary-card:nth-child(3) {
+  border-color: oklch(0.72 0.19 155 / 32%);
+}
+
+.months-editor-summary-icon {
+  display: flex;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.85rem;
+  background: oklch(0.3 0.12 265 / 35%);
+  color: var(--dashboard-blue);
+}
+
+.months-editor-summary-card:nth-child(2) .months-editor-summary-icon {
+  background: oklch(0.32 0.12 20 / 28%);
+  color: var(--dashboard-red);
+}
+
+.months-editor-summary-card:nth-child(3) .months-editor-summary-icon {
+  background: oklch(0.32 0.12 155 / 28%);
+  color: var(--dashboard-green);
+}
+
+.months-editor-secondary-button {
+  border-color: var(--dashboard-border);
+  background: oklch(0.2 0.06 265 / 66%);
+  color: var(--foreground);
+}
+
+.months-editor-secondary-button:hover {
+  border-color: oklch(0.68 0.15 275 / 48%);
+  background: oklch(0.27 0.08 275 / 34%);
+}
+
+.months-editor-debts {
+  display: grid;
+  gap: 0.875rem;
+  padding: 1rem;
+  border: 1px solid var(--dashboard-border-soft);
+  border-radius: 1.15rem;
+  background: linear-gradient(145deg, oklch(0.12 0.045 265 / 92%), oklch(0.09 0.035 265 / 96%));
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 3%);
+}
+
+.months-editor-debts-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.months-editor-dialog .dashboard-home-debt-list {
+  display: grid;
+  gap: 0.5rem;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.months-editor-dialog .dashboard-home-debt-row {
+  display: grid;
+  min-width: 0;
+  min-height: 4.5rem;
+  grid-template-columns: 2.5rem minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--dashboard-border-soft);
+  border-radius: 0.9rem;
+  background: linear-gradient(115deg, oklch(0.14 0.05 265 / 84%), oklch(0.11 0.04 265 / 90%));
+}
+
+.months-editor-dialog .dashboard-home-debt-row:hover {
+  border-color: oklch(0.62 0.16 265 / 42%);
+  background: linear-gradient(115deg, oklch(0.18 0.07 265 / 92%), oklch(0.13 0.045 265 / 94%));
+}
+
+.months-editor-dialog .dashboard-home-debt-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.months-editor-dialog .dashboard-home-debt-actions {
+  gap: 0.25rem;
+}
+
+.months-editor-dialog .dashboard-home-debt-actions button {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.months-editor-dialog .dashboard-debt-list > :not([hidden]) ~ :not([hidden]) {
+  border-color: oklch(0.6 0.06 265 / 12%);
+}
+
+@media (min-width: 1024px) {
+  .months-summary-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .months-summary-card {
+    min-height: 5.5rem;
+    padding-inline: 1.1rem;
+  }
+}
+
+@media (max-width: 639px) {
+  .months-editor-debts {
+    padding: 0.75rem;
+  }
+
+  .months-editor-debts-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .months-editor-dialog .dashboard-home-debt-row {
+    grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    gap: 0.4rem 0.625rem;
+    padding: 0.65rem 0.7rem;
+  }
+
+  .months-editor-dialog .dashboard-home-debt-icon {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .months-editor-dialog .dashboard-home-debt-main {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .months-editor-dialog .dashboard-home-debt-amount {
+    grid-column: 3;
+    grid-row: 1;
+    font-size: 0.8rem;
+  }
+
+  .months-editor-dialog .dashboard-home-debt-actions {
+    grid-column: 2 / 4;
+    grid-row: 2;
+    justify-self: end;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

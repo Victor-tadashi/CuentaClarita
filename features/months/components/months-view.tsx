@@ -2,8 +2,18 @@
 
 import * as React from 'react'
 import { toast } from 'sonner'
-import { Plus, CalendarDays, Pencil, WalletCards } from 'lucide-react'
+import {
+  CalendarDays,
+  CircleCheck,
+  CircleDot,
+  Pencil,
+  PiggyBank,
+  Plus,
+  Receipt,
+  WalletCards,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { PageHeader } from '@/features/shared/components/page-header'
 import { EmptyState } from '@/features/shared/components/empty-state'
 import { ConfirmDialog } from '@/features/shared/components/confirm-dialog'
@@ -26,7 +36,24 @@ import {
 } from '@/components/ui/dialog'
 
 export function MonthsView() {
-  const { loaded, loadingError, loadingMessage, retryLoad, sortedMonths, getMonth, getMonthDebts, getMonthSummary, deleteMonth, addDebt, updateDebt, deleteDebt, updateSalary, syncError, retrySync } = useFinance()
+  const {
+    loaded,
+    loadingError,
+    loadingMessage,
+    retryLoad,
+    activeMonth,
+    sortedMonths,
+    getMonth,
+    getMonthDebts,
+    getMonthSummary,
+    deleteMonth,
+    addDebt,
+    updateDebt,
+    deleteDebt,
+    updateSalary,
+    syncError,
+    retrySync,
+  } = useFinance()
   const [pendingDelete, setPendingDelete] = React.useState<Month | null>(null)
   const [selectedMonthId, setSelectedMonthId] = React.useState<string | null>(null)
   const [salaryOpen, setSalaryOpen] = React.useState(false)
@@ -36,25 +63,53 @@ export function MonthsView() {
   const selectedMonth = selectedMonthId ? getMonth(selectedMonthId) ?? null : null
   const selectedSummary = selectedMonth ? getMonthSummary(selectedMonth.id) : null
   const selectedDebts = selectedMonth ? getMonthDebts(selectedMonth.id) : []
+  const selectedMonthStatus = selectedMonth
+    ? selectedMonth.id === activeMonth?.id
+      ? 'Mes activo'
+      : getCalendarMonthStatus(selectedMonth) === 'future'
+        ? 'Próximo'
+        : 'Finalizado'
+    : null
+  const finishedMonthCount = sortedMonths.filter(
+    (month) =>
+      month.id !== activeMonth?.id &&
+      getCalendarMonthStatus(month) === 'finished',
+  ).length
+
   const openDebtForm = (debt?: Debt) => {
     setEditingDebt(debt ?? null)
     setDebtOpen(true)
   }
 
-  if (!loaded) return <div className="flex min-h-48 items-center justify-center text-sm text-muted-foreground">{loadingMessage ?? 'Cargando tus meses...'}</div>
-  if (loadingError) return <div className="flex min-h-48 flex-col items-center justify-center gap-3 text-center"><p className="text-sm text-destructive">{loadingError}</p><Button variant="outline" onClick={retryLoad}>Reintentar</Button></div>
+  if (!loaded) {
+    return (
+      <div className="flex min-h-48 items-center justify-center text-sm text-muted-foreground">
+        {loadingMessage ?? 'Cargando tus meses...'}
+      </div>
+    )
+  }
+
+  if (loadingError) {
+    return (
+      <div className="flex min-h-48 flex-col items-center justify-center gap-3 text-center">
+        <p className="text-sm text-destructive">{loadingError}</p>
+        <Button variant="outline" onClick={retryLoad}>Reintentar</Button>
+      </div>
+    )
+  }
 
   return (
-    <>
+    <div className="months-view">
       <PageHeader
+        icon={CalendarDays}
         title="Administrar Meses"
         description="Crea y gestiona tus meses. Cada mes es una fotografía independiente de tus finanzas."
         action={
           sortedMonths.length > 0 ? (
             <CreateMonthWizard
               trigger={
-                <Button size="lg">
-                  <Plus /> Crear Mes
+                <Button size="lg" className="dashboard-home-cta h-11 w-full rounded-xl px-4 sm:w-auto">
+                  <Plus data-icon="inline-start" /> Crear Mes
                 </Button>
               }
             />
@@ -69,6 +124,40 @@ export function MonthsView() {
         </div>
       ) : null}
 
+      <section className="months-summary-grid" aria-label="Resumen de meses">
+        <article className="months-summary-card">
+          <span className="months-summary-icon" aria-hidden="true">
+            <CalendarDays className="size-5" />
+          </span>
+          <div className="min-w-0">
+            <p className="months-summary-label">Total de meses</p>
+            <p className="months-summary-value">{sortedMonths.length}</p>
+          </div>
+        </article>
+        <article className="months-summary-card">
+          <span className="months-summary-icon" aria-hidden="true">
+            <CircleDot className="size-5" />
+          </span>
+          <div className="min-w-0">
+            <p className="months-summary-label">Mes activo</p>
+            <p className="months-summary-value">
+              {activeMonth
+                ? monthLabel(activeMonth.month, activeMonth.year)
+                : 'Sin mes activo'}
+            </p>
+          </div>
+        </article>
+        <article className="months-summary-card">
+          <span className="months-summary-icon" aria-hidden="true">
+            <CircleCheck className="size-5" />
+          </span>
+          <div className="min-w-0">
+            <p className="months-summary-label">Meses finalizados</p>
+            <p className="months-summary-value">{finishedMonthCount}</p>
+          </div>
+        </article>
+      </section>
+
       {sortedMonths.length === 0 ? (
         <EmptyState
           icon={CalendarDays}
@@ -77,20 +166,21 @@ export function MonthsView() {
           action={
             <CreateMonthWizard
               trigger={
-                <Button size="lg">
-                  <Plus /> Crear mi primer mes
+                <Button size="lg" className="dashboard-home-cta rounded-xl px-4">
+                  <Plus data-icon="inline-start" /> Crear mi primer mes
                 </Button>
               }
             />
           }
         />
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="months-card-grid">
           {sortedMonths.map((month) => (
             <MonthCard
               key={month.id}
               month={month}
               summary={getMonthSummary(month.id)}
+              isActive={activeMonth?.id === month.id}
               onDelete={() => setPendingDelete(month)}
               onOpen={() => setSelectedMonthId(month.id)}
             />
@@ -108,45 +198,102 @@ export function MonthsView() {
           }
         }}
       >
-        <DialogContent className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-2xl">
+        <DialogContent className="months-editor-dialog max-h-[calc(100dvh-1.5rem)] w-[calc(100%-1rem)] overflow-x-hidden overflow-y-auto p-4 sm:max-w-5xl sm:p-6">
           {selectedMonth && selectedSummary ? (
             <>
-              <DialogHeader>
-                <DialogTitle className="text-xl">{monthLabel(selectedMonth.month, selectedMonth.year)}</DialogTitle>
-                <DialogDescription>
-                  {getCalendarMonthStatus(selectedMonth) === 'current' ? 'Mes activo' : getCalendarMonthStatus(selectedMonth) === 'future' ? 'Próximo' : 'Finalizado'} · Editando
-                </DialogDescription>
+              <DialogHeader className="months-editor-header">
+                <span className="months-editor-title-icon" aria-hidden="true">
+                  <Pencil className="size-5" />
+                </span>
+                <div className="min-w-0">
+                  <DialogTitle className="text-xl">Editar mes</DialogTitle>
+                  <DialogDescription className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-2">
+                    Estás editando:
+                    <span className="font-semibold text-foreground">
+                      {monthLabel(selectedMonth.month, selectedMonth.year)}
+                    </span>
+                    {selectedMonthStatus ? (
+                      <Badge
+                        variant={selectedMonthStatus === 'Mes activo' ? 'default' : 'secondary'}
+                        className="month-card-badge"
+                      >
+                        {selectedMonthStatus}
+                      </Badge>
+                    ) : null}
+                  </DialogDescription>
+                </div>
               </DialogHeader>
 
               <div className="grid gap-3 sm:grid-cols-3">
-                <div className="rounded-xl border border-border/60 bg-card/70 p-4">
-                  <p className="text-xs text-muted-foreground">Sueldo</p>
-                  <Amount value={selectedSummary.salary} className="mt-1 text-xl font-semibold" />
-                  <Button variant="outline" size="sm" className="mt-3" onClick={() => setSalaryOpen(true)}>
+                <article className="months-editor-summary-card">
+                  <div className="flex items-center gap-3">
+                    <span className="months-editor-summary-icon" aria-hidden="true">
+                      <WalletCards className="size-5" />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-xs text-muted-foreground">Sueldo</p>
+                      <Amount value={selectedSummary.salary} className="mt-1 text-xl font-semibold" />
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="months-editor-secondary-button mt-3 h-9 rounded-lg px-3"
+                    onClick={() => setSalaryOpen(true)}
+                  >
                     <Pencil data-icon="inline-start" /> Editar sueldo
                   </Button>
-                </div>
-                <div className="rounded-xl border border-border/60 bg-card/70 p-4">
-                  <p className="text-xs text-muted-foreground">Deudas</p>
-                  <Amount value={selectedSummary.totalDebts} tone="negative" className="mt-1 text-xl font-semibold" />
-                  <p className="mt-2 text-xs text-muted-foreground">{selectedSummary.debtCount} deuda{selectedSummary.debtCount === 1 ? '' : 's'}</p>
-                </div>
-                <div className="rounded-xl border border-border/60 bg-card/70 p-4">
-                  <p className="text-xs text-muted-foreground">Disponible</p>
-                  <Amount value={selectedSummary.available} tone={selectedSummary.available < 0 ? 'negative' : 'positive'} className="mt-1 text-xl font-semibold" />
-                </div>
+                </article>
+                <article className="months-editor-summary-card">
+                  <div className="flex items-center gap-3">
+                    <span className="months-editor-summary-icon" aria-hidden="true">
+                      <Receipt className="size-5" />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-xs text-muted-foreground">Total de deudas</p>
+                      <Amount value={selectedSummary.totalDebts} tone="negative" className="mt-1 text-xl font-semibold" />
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {selectedSummary.debtCount} deuda{selectedSummary.debtCount === 1 ? '' : 's'}
+                      </p>
+                    </div>
+                  </div>
+                </article>
+                <article className="months-editor-summary-card">
+                  <div className="flex items-center gap-3">
+                    <span className="months-editor-summary-icon" aria-hidden="true">
+                      <PiggyBank className="size-5" />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-xs text-muted-foreground">Disponible</p>
+                      <Amount
+                        value={selectedSummary.available}
+                        tone={selectedSummary.available < 0 ? 'negative' : 'positive'}
+                        className="mt-1 text-xl font-semibold"
+                      />
+                    </div>
+                  </div>
+                </article>
               </div>
 
-              <section className="grid gap-3">
-                <div className="flex items-center justify-between gap-3">
-                  <h3 className="font-semibold">Deudas del mes</h3>
-                  <Button size="sm" onClick={() => openDebtForm()}>
+              <section className="months-editor-debts">
+                <div className="months-editor-debts-header">
+                  <div className="min-w-0">
+                    <h3 className="font-semibold">
+                      Deudas del mes <span className="text-muted-foreground">({selectedSummary.debtCount})</span>
+                    </h3>
+                  </div>
+                  <Button
+                    size="sm"
+                    className="dashboard-home-cta h-10 rounded-xl px-3 sm:h-9"
+                    onClick={() => openDebtForm()}
+                  >
                     <Plus data-icon="inline-start" /> Agregar deuda
                   </Button>
                 </div>
                 {selectedDebts.length ? (
                   <DebtList
                     debts={selectedDebts}
+                    appearance="dashboard"
                     editable
                     onEdit={openDebtForm}
                     onDelete={setPendingDebtDelete}
@@ -163,6 +310,7 @@ export function MonthsView() {
       </Dialog>
 
       <SalaryDialog
+        className="dashboard-home-dialog"
         open={salaryOpen && selectedMonth !== null}
         onOpenChange={setSalaryOpen}
         initialSalary={selectedMonth?.salary ?? 0}
@@ -172,6 +320,7 @@ export function MonthsView() {
       />
 
       <DebtFormDialog
+        className="dashboard-home-dialog"
         open={debtOpen}
         onOpenChange={setDebtOpen}
         initialValue={editingDebt ? { name: editingDebt.name, amount: editingDebt.amount, dueDate: editingDebt.dueDate, notes: editingDebt.notes } : null}
@@ -217,6 +366,6 @@ export function MonthsView() {
           }
         }}
       />
-    </>
+    </div>
   )
 }
