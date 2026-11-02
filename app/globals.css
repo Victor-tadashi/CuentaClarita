@@ -212,6 +212,745 @@
   background: oklch(0.24 0.07 265 / 22%);
 }
 
+.history-page {
+  display: grid;
+  min-width: 0;
+  gap: 1.5rem;
+}
+
+.history-page-header {
+  margin-bottom: 0.25rem;
+  align-items: center;
+}
+
+.history-page-header > div:first-child > span:first-child {
+  width: 4.25rem;
+  height: 4.25rem;
+  border-color: oklch(0.69 0.17 270 / 24%);
+  border-radius: 1.2rem;
+  background: linear-gradient(145deg, oklch(0.38 0.17 275), oklch(0.27 0.14 265));
+  color: oklch(0.76 0.15 245);
+  box-shadow: 0 0.75rem 1.5rem oklch(0.1 0.12 275 / 25%), inset 0 1px 0 oklch(1 0 0 / 8%);
+}
+
+.history-page-header > div:first-child > span:first-child > svg {
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+.history-page-header h1 {
+  color: var(--foreground);
+  font-size: clamp(1.8rem, 3vw, 2.45rem);
+  font-weight: 750;
+  letter-spacing: -0.045em;
+  line-height: 1.08;
+}
+
+.history-page-header p {
+  max-width: 45rem;
+  color: var(--muted-foreground);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.history-summary-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.9rem;
+}
+
+.history-summary-card {
+  display: flex;
+  min-width: 0;
+  min-height: 7rem;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.1rem 1.15rem;
+  border-radius: 1.25rem;
+  backdrop-filter: blur(12px);
+}
+
+.history-summary-icon {
+  display: grid;
+  width: 3.1rem;
+  height: 3.1rem;
+  flex: none;
+  place-items: center;
+  border-radius: 1rem;
+  background: oklch(0.3 0.12 265 / 42%);
+  color: var(--dashboard-blue);
+}
+
+.history-summary-label {
+  color: var(--muted-foreground);
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.history-summary-value {
+  display: block;
+  max-width: 100%;
+  margin-top: 0.25rem;
+  font-size: clamp(1.2rem, 1.8vw, 1.75rem);
+  font-weight: 700;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.history-summary-description {
+  margin-top: 0.35rem;
+  color: var(--muted-foreground);
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+
+.history-year-list {
+  display: grid;
+  min-width: 0;
+  gap: 1.75rem;
+}
+
+.history-year-section {
+  min-width: 0;
+}
+
+.history-year-heading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.history-year-icon {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex: none;
+  place-items: center;
+  color: var(--primary);
+}
+
+.history-year-title {
+  flex: none;
+  color: var(--foreground);
+  font-size: 1.65rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.history-year-count {
+  height: 2rem;
+  flex: none;
+  padding-inline: 0.8rem;
+  border: 1px solid var(--dashboard-border-soft);
+  background: oklch(0.26 0.07 265 / 75%);
+  color: oklch(0.9 0.025 265);
+  font-size: 0.75rem;
+}
+
+.history-year-rule {
+  height: 1px;
+  min-width: 0;
+  flex: 1;
+  margin-left: 0.2rem;
+  background: linear-gradient(90deg, var(--dashboard-border), transparent);
+}
+
+.history-month-list {
+  display: grid;
+  gap: 0.75rem;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.history-month-list > li {
+  min-width: 0;
+}
+
+.history-row-button {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'month arrow'
+    'metrics metrics';
+  align-items: center;
+  gap: 0.8rem 0.6rem;
+  padding: 0.9rem;
+  border: 1px solid var(--dashboard-border-soft);
+  border-radius: 1.25rem;
+  background: linear-gradient(145deg, oklch(0.14 0.045 265 / 96%), oklch(0.1 0.035 265 / 98%));
+  box-shadow: 0 0.75rem 1.75rem oklch(0.02 0.04 265 / 14%), inset 0 1px 0 oklch(1 0 0 / 3%);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+.history-row-button:hover {
+  border-color: oklch(0.62 0.16 265 / 50%);
+  background: linear-gradient(145deg, oklch(0.18 0.065 265 / 96%), oklch(0.12 0.045 265 / 98%));
+  transform: translateY(-1px);
+}
+
+.history-row-button:focus-visible {
+  outline: 2px solid var(--dashboard-blue);
+  outline-offset: 3px;
+}
+
+.history-row-button-active,
+.history-row-button-active:hover {
+  border-color: transparent;
+  background:
+    linear-gradient(145deg, oklch(0.16 0.055 270 / 98%), oklch(0.1 0.035 265 / 98%)) padding-box,
+    linear-gradient(105deg, oklch(0.68 0.22 300), oklch(0.62 0.2 265)) border-box;
+  box-shadow: 0 0 1.1rem oklch(0.5 0.2 285 / 24%), 0 0.75rem 1.75rem oklch(0.02 0.04 265 / 17%), inset 0 1px 0 oklch(1 0 0 / 5%);
+}
+
+.history-row-month {
+  display: flex;
+  min-width: 0;
+  grid-area: month;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.history-row-calendar {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex: none;
+  place-items: center;
+  border: 1px solid oklch(0.66 0.14 265 / 12%);
+  border-radius: 0.95rem;
+  background: linear-gradient(145deg, oklch(0.3 0.12 265 / 78%), oklch(0.22 0.1 265 / 88%));
+  color: oklch(0.77 0.13 235);
+}
+
+.history-row-month-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.history-row-month-name {
+  overflow: hidden;
+  color: var(--foreground);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history-row-month-year {
+  margin-top: 0.3rem;
+  color: var(--muted-foreground);
+  font-size: 0.85rem;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.history-status-badge {
+  height: 1.85rem;
+  flex: none;
+  gap: 0.45rem;
+  margin-left: auto;
+  padding-inline: 0.7rem;
+  border: 1px solid var(--dashboard-border-soft);
+  background: oklch(0.24 0.025 265 / 75%);
+  color: oklch(0.82 0.02 265);
+  font-size: 0.72rem;
+}
+
+.history-status-badge[data-status='active'] {
+  border-color: oklch(0.72 0.16 158 / 24%);
+  background: oklch(0.28 0.08 158 / 28%);
+  color: oklch(0.86 0.14 158);
+}
+
+.history-status-dot {
+  width: 0.42rem;
+  height: 0.42rem;
+  flex: none;
+  border-radius: 999px;
+  background: oklch(0.68 0.025 265);
+}
+
+.history-status-badge[data-status='active'] .history-status-dot {
+  background: var(--dashboard-green);
+  box-shadow: 0 0 0 0.18rem oklch(0.72 0.19 155 / 12%), 0 0 0.65rem oklch(0.72 0.19 155 / 48%);
+}
+
+.history-row-metrics {
+  display: grid;
+  min-width: 0;
+  grid-area: metrics;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.history-row-metric {
+  display: flex;
+  min-width: 0;
+  min-height: 3.6rem;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.6rem 0.65rem;
+  border: 1px solid var(--dashboard-border-soft);
+  border-radius: 0.9rem;
+  background: oklch(0.16 0.045 265 / 76%);
+}
+
+.history-row-metric-icon {
+  width: 1.2rem;
+  height: 1.2rem;
+  flex: none;
+  color: var(--dashboard-blue);
+}
+
+.history-row-debt-count .history-row-metric-icon {
+  color: oklch(0.75 0.08 265);
+}
+
+.history-row-total-debts .history-row-metric-icon {
+  color: var(--dashboard-red);
+}
+
+.history-row-available .history-row-metric-icon {
+  color: var(--dashboard-green);
+}
+
+.history-row-metric-content {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.18rem;
+}
+
+.history-row-metric-label {
+  color: var(--muted-foreground);
+  font-size: 0.66rem;
+  line-height: 1.2;
+}
+
+.history-row-metric-value {
+  display: block;
+  overflow: hidden;
+  color: var(--foreground);
+  font-size: 0.8rem;
+  font-weight: 650;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history-row-total-debts .history-row-metric-value {
+  color: var(--dashboard-red);
+}
+
+.history-row-available .history-row-metric-value {
+  color: var(--dashboard-green);
+}
+
+.history-row-chevron {
+  width: 1.25rem;
+  height: 1.25rem;
+  grid-area: arrow;
+  color: oklch(0.84 0.04 265);
+  transition: transform 160ms ease;
+}
+
+.history-row-button:hover .history-row-chevron {
+  transform: translateX(2px);
+}
+
+.history-page-state {
+  display: flex;
+  min-height: 12rem;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted-foreground);
+  font-size: 0.9rem;
+}
+
+.history-page-error {
+  flex-direction: column;
+  gap: 0.85rem;
+  text-align: center;
+}
+
+.history-page-error p {
+  color: var(--negative);
+}
+
+.history-retry-button {
+  min-height: 2.75rem;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--dashboard-border);
+  border-radius: 0.8rem;
+  background: linear-gradient(145deg, oklch(0.17 0.05 265 / 85%), oklch(0.12 0.04 265 / 90%));
+  color: var(--foreground);
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.history-retry-button:hover {
+  border-color: oklch(0.68 0.15 275 / 48%);
+  background: oklch(0.24 0.08 275 / 34%);
+}
+
+.history-detail-dialog {
+  max-height: calc(100dvh - 1.5rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--dashboard-border);
+  border-radius: 1.3rem;
+  background:
+    radial-gradient(ellipse at 100% 0%, oklch(0.34 0.14 275 / 14%), transparent 18rem),
+    linear-gradient(145deg, oklch(0.17 0.055 265 / 98%), oklch(0.1 0.04 265 / 99%));
+  box-shadow: 0 1.5rem 4rem oklch(0.02 0.04 265 / 55%), inset 0 1px 0 oklch(1 0 0 / 4%);
+}
+
+.history-detail-dialog [data-slot='dialog-header'] {
+  padding-right: 2rem;
+}
+
+.history-detail-dialog [data-slot='dialog-title'] {
+  color: var(--foreground);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.history-dialog-summary-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.6rem;
+}
+
+.history-dialog-summary-card {
+  min-width: 0;
+  border: 1px solid var(--dashboard-border-soft);
+  background: linear-gradient(145deg, oklch(0.14 0.045 265 / 94%), var(--dashboard-surface));
+}
+
+.history-dialog-available-card {
+  border-color: oklch(0.63 0.17 155 / 52%);
+  background: linear-gradient(145deg, oklch(0.14 0.055 155 / 28%), oklch(0.13 0.04 265 / 92%));
+}
+
+.history-dialog-debt-scroll {
+  max-height: none;
+  overflow: visible;
+}
+
+.history-detail-dialog .dashboard-debt-list {
+  border-radius: 1rem;
+}
+
+@media (min-width: 640px) {
+  .history-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .history-summary-card:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+
+  .history-dialog-summary-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .history-dialog-debt-scroll {
+    max-height: 16rem;
+    overflow-y: auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .history-summary-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .history-summary-card:nth-child(3) {
+    grid-column: auto;
+  }
+
+  .history-row-button {
+    grid-template-columns: minmax(10rem, 1.1fr) minmax(0, 3fr) auto;
+    grid-template-areas: 'month metrics arrow';
+    gap: 0.85rem;
+    padding: 1rem 1.1rem;
+  }
+
+  .history-row-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+  }
+
+  .history-row-metric {
+    min-height: 3rem;
+    gap: 0.45rem;
+    padding: 0.1rem 0.45rem 0.1rem 0.7rem;
+    border: 0;
+    border-left: 1px solid var(--dashboard-border-soft);
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .history-row-metric-icon {
+    width: 1.35rem;
+    height: 1.35rem;
+  }
+
+  .history-row-metric-label {
+    font-size: 0.65rem;
+  }
+
+  .history-row-metric-value {
+    font-size: 0.78rem;
+  }
+
+  .history-row-debt-count .history-row-metric-content {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 0.25rem;
+  }
+
+  .history-row-debt-count .history-row-metric-label {
+    order: 2;
+    color: var(--muted-foreground);
+    font-size: 0.72rem;
+  }
+
+  .history-row-debt-count .history-row-metric-value {
+    order: 1;
+    font-size: 0.85rem;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1199px) {
+  .history-row-button {
+    grid-template-columns: minmax(9rem, 1fr) minmax(0, 2.9fr) auto;
+    gap: 0.55rem;
+    padding-inline: 0.8rem;
+  }
+
+  .history-row-month {
+    gap: 0.5rem;
+  }
+
+  .history-row-calendar {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .history-status-badge {
+    padding-inline: 0.5rem;
+    font-size: 0.65rem;
+  }
+
+  .history-row-metric {
+    gap: 0.3rem;
+    padding-left: 0.4rem;
+  }
+
+  .history-row-metric-icon {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+
+  .history-row-metric-label {
+    font-size: 0.6rem;
+  }
+
+  .history-row-metric-value {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 639px) {
+  .history-page {
+    gap: 1.2rem;
+  }
+
+  .history-page-header > div:first-child > span:first-child {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 1rem;
+  }
+
+  .history-page-header h1 {
+    font-size: clamp(1.7rem, 7vw, 2rem);
+  }
+
+  .history-page-header p {
+    font-size: 0.82rem;
+  }
+
+  .history-summary-grid {
+    gap: 0.7rem;
+  }
+
+  .history-summary-card {
+    min-height: 6.1rem;
+    gap: 0.8rem;
+    padding: 0.85rem;
+    border-radius: 1.05rem;
+  }
+
+  .history-summary-icon {
+    width: 2.7rem;
+    height: 2.7rem;
+    border-radius: 0.85rem;
+  }
+
+  .history-summary-value {
+    font-size: clamp(1.15rem, 5vw, 1.45rem);
+  }
+
+  .history-summary-description {
+    font-size: 0.66rem;
+  }
+
+  .history-year-heading {
+    gap: 0.55rem;
+    margin-bottom: 0.7rem;
+  }
+
+  .history-year-icon {
+    width: 1.9rem;
+    height: 1.9rem;
+  }
+
+  .history-year-title {
+    font-size: 1.4rem;
+  }
+
+  .history-year-count {
+    height: 1.8rem;
+    padding-inline: 0.55rem;
+    font-size: 0.68rem;
+  }
+
+  .history-month-list {
+    gap: 0.65rem;
+  }
+
+  .history-row-button {
+    gap: 0.75rem 0.4rem;
+    padding: 0.75rem;
+    border-radius: 1.05rem;
+  }
+
+  .history-row-month {
+    gap: 0.55rem;
+  }
+
+  .history-row-calendar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.8rem;
+  }
+
+  .history-row-month-name {
+    font-size: 0.92rem;
+  }
+
+  .history-row-month-year {
+    margin-top: 0.2rem;
+    font-size: 0.75rem;
+  }
+
+  .history-status-badge {
+    height: 1.7rem;
+    gap: 0.35rem;
+    padding-inline: 0.55rem;
+    font-size: 0.65rem;
+  }
+
+  .history-row-metrics {
+    gap: 0.4rem;
+  }
+
+  .history-row-metric {
+    min-height: 3.35rem;
+    gap: 0.4rem;
+    padding: 0.55rem;
+    border-radius: 0.8rem;
+  }
+
+  .history-row-metric-icon {
+    width: 1.05rem;
+    height: 1.05rem;
+  }
+
+  .history-row-metric-label {
+    font-size: 0.61rem;
+  }
+
+  .history-row-metric-value {
+    font-size: 0.73rem;
+  }
+
+  .history-row-chevron {
+    margin-top: 0.2rem;
+  }
+
+  .history-detail-dialog {
+    max-height: calc(100dvh - 1rem);
+    border-radius: 1.1rem;
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 359px) {
+  .history-page-header > div:first-child > span:first-child {
+    width: 3.15rem;
+    height: 3.15rem;
+  }
+
+  .history-page-header > div:first-child {
+    gap: 0.65rem;
+  }
+
+  .history-row-button {
+    padding: 0.65rem;
+  }
+
+  .history-row-month {
+    gap: 0.4rem;
+  }
+
+  .history-row-calendar {
+    width: 2.3rem;
+    height: 2.3rem;
+  }
+
+  .history-status-badge {
+    gap: 0.25rem;
+    padding-inline: 0.4rem;
+    font-size: 0.6rem;
+  }
+
+  .history-row-metric {
+    gap: 0.3rem;
+    padding-inline: 0.45rem;
+  }
+
+  .history-row-metric-value {
+    font-size: 0.68rem;
+  }
+}
+
 .dashboard-summary-card {
   border: 1px solid var(--dashboard-border-soft);
   background: linear-gradient(145deg, oklch(0.13 0.04 265 / 96%), var(--dashboard-surface));
@@ -1655,6 +2394,351 @@
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+  }
+}
+
+.months-summary-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.months-summary-card {
+  display: flex;
+  min-width: 0;
+  min-height: 5rem;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--dashboard-border-soft);
+  border-radius: 1.1rem;
+  background: linear-gradient(145deg, oklch(0.13 0.04 265 / 96%), var(--dashboard-surface));
+  box-shadow: 0 0.8rem 1.8rem oklch(0.02 0.04 265 / 18%), inset 0 1px 0 oklch(1 0 0 / 4%);
+  backdrop-filter: blur(12px);
+}
+
+.months-summary-card:nth-child(1) {
+  border-color: oklch(0.62 0.2 265 / 50%);
+}
+
+.months-summary-card:nth-child(2) {
+  border-color: oklch(0.72 0.19 155 / 48%);
+  background: linear-gradient(145deg, oklch(0.15 0.05 155 / 42%), var(--dashboard-surface));
+}
+
+.months-summary-card:nth-child(3) {
+  border-color: oklch(0.67 0.19 285 / 48%);
+  background: linear-gradient(145deg, oklch(0.16 0.055 285 / 42%), var(--dashboard-surface));
+}
+
+.months-summary-icon {
+  display: flex;
+  width: 2.8rem;
+  height: 2.8rem;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid oklch(0.65 0.15 265 / 16%);
+  border-radius: 0.95rem;
+  background: oklch(0.29 0.12 265 / 35%);
+  color: var(--dashboard-blue);
+}
+
+.months-summary-card:nth-child(2) .months-summary-icon {
+  border-color: oklch(0.72 0.19 155 / 16%);
+  background: oklch(0.31 0.11 155 / 26%);
+  color: var(--dashboard-green);
+}
+
+.months-summary-card:nth-child(3) .months-summary-icon {
+  border-color: oklch(0.67 0.19 285 / 18%);
+  background: oklch(0.32 0.13 285 / 28%);
+  color: var(--primary);
+}
+
+.months-summary-label {
+  color: var(--muted-foreground);
+  font-size: 0.76rem;
+  font-weight: 500;
+}
+
+.months-summary-value {
+  display: block;
+  margin-top: 0.2rem;
+  overflow-wrap: anywhere;
+  color: var(--foreground);
+  font-size: clamp(1.1rem, 1.5vw, 1.35rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+.months-summary-card:nth-child(2) .months-summary-value {
+  font-size: clamp(0.95rem, 1.25vw, 1.12rem);
+}
+
+.months-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: 0.875rem;
+}
+
+.months-view .dashboard-month-card {
+  border-radius: 1.15rem;
+  background: linear-gradient(145deg, oklch(0.13 0.04 265 / 98%), oklch(0.1 0.035 265 / 98%));
+}
+
+.months-view .dashboard-month-card[data-active='true'] {
+  border-color: oklch(0.7 0.18 285 / 88%);
+  background:
+    radial-gradient(ellipse at 100% 0%, oklch(0.4 0.16 285 / 15%), transparent 65%),
+    linear-gradient(145deg, oklch(0.16 0.055 275 / 98%), oklch(0.11 0.045 265 / 98%));
+  box-shadow: 0 0 0 1px oklch(0.7 0.18 285 / 35%), 0 1rem 2rem oklch(0.02 0.04 265 / 24%), inset 0 1px 0 oklch(1 0 0 / 5%);
+}
+
+.month-card-icon {
+  display: flex;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid oklch(0.62 0.16 265 / 18%);
+  border-radius: 0.85rem;
+  background: oklch(0.3 0.12 265 / 35%);
+  color: var(--dashboard-blue);
+}
+
+.months-view .dashboard-month-card[data-active='true'] .month-card-icon {
+  border-color: oklch(0.7 0.18 285 / 24%);
+  background: oklch(0.34 0.15 285 / 34%);
+  color: var(--primary);
+}
+
+.month-card-badge[data-status='active'] {
+  border-color: oklch(0.77 0.14 285 / 22%);
+  background: linear-gradient(110deg, oklch(0.54 0.19 285), oklch(0.44 0.17 265));
+  color: #fff;
+}
+
+.month-card-badge[data-status='future'] {
+  border-color: oklch(0.62 0.06 265 / 24%);
+  background: oklch(0.28 0.035 265 / 80%);
+  color: oklch(0.88 0.025 265);
+}
+
+.month-card-badge[data-status='finished'] {
+  border-color: oklch(0.62 0.06 265 / 20%);
+  background: oklch(0.23 0.025 265 / 80%);
+  color: oklch(0.78 0.025 265);
+}
+
+.months-editor-dialog {
+  max-height: calc(100dvh - 1.5rem);
+  border: 1px solid var(--dashboard-border);
+  border-radius: 1.35rem;
+  background:
+    radial-gradient(ellipse at 100% 0%, oklch(0.34 0.14 275 / 16%), transparent 20rem),
+    linear-gradient(145deg, oklch(0.17 0.055 265 / 99%), oklch(0.1 0.04 265 / 99%));
+  box-shadow: 0 1.5rem 4rem oklch(0.02 0.04 265 / 58%), inset 0 1px 0 oklch(1 0 0 / 4%);
+}
+
+.months-editor-dialog [data-slot='dialog-title'] {
+  font-size: 1.25rem;
+  font-weight: 650;
+  letter-spacing: -0.03em;
+}
+
+.months-editor-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.875rem;
+  padding-right: 2rem;
+}
+
+.months-editor-title-icon {
+  display: flex;
+  width: 2.8rem;
+  height: 2.8rem;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid oklch(0.7 0.16 285 / 20%);
+  border-radius: 0.95rem;
+  background: oklch(0.33 0.14 285 / 32%);
+  color: var(--primary);
+}
+
+.months-editor-summary-card {
+  min-width: 0;
+  padding: 0.9rem;
+  border: 1px solid var(--dashboard-border-soft);
+  border-radius: 1rem;
+  background: linear-gradient(145deg, oklch(0.15 0.05 265 / 88%), oklch(0.12 0.04 265 / 92%));
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 3%);
+}
+
+.months-editor-summary-card:nth-child(1) {
+  border-color: oklch(0.62 0.2 265 / 35%);
+}
+
+.months-editor-summary-card:nth-child(2) {
+  border-color: oklch(0.66 0.19 20 / 32%);
+}
+
+.months-editor-summary-card:nth-child(3) {
+  border-color: oklch(0.72 0.19 155 / 32%);
+}
+
+.months-editor-summary-icon {
+  display: flex;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.85rem;
+  background: oklch(0.3 0.12 265 / 35%);
+  color: var(--dashboard-blue);
+}
+
+.months-editor-summary-card:nth-child(2) .months-editor-summary-icon {
+  background: oklch(0.32 0.12 20 / 28%);
+  color: var(--dashboard-red);
+}
+
+.months-editor-summary-card:nth-child(3) .months-editor-summary-icon {
+  background: oklch(0.32 0.12 155 / 28%);
+  color: var(--dashboard-green);
+}
+
+.months-editor-secondary-button {
+  border-color: var(--dashboard-border);
+  background: oklch(0.2 0.06 265 / 66%);
+  color: var(--foreground);
+}
+
+.months-editor-secondary-button:hover {
+  border-color: oklch(0.68 0.15 275 / 48%);
+  background: oklch(0.27 0.08 275 / 34%);
+}
+
+.months-editor-debts {
+  display: grid;
+  gap: 0.875rem;
+  padding: 1rem;
+  border: 1px solid var(--dashboard-border-soft);
+  border-radius: 1.15rem;
+  background: linear-gradient(145deg, oklch(0.12 0.045 265 / 92%), oklch(0.09 0.035 265 / 96%));
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 3%);
+}
+
+.months-editor-debts-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.months-editor-dialog .dashboard-home-debt-list {
+  display: grid;
+  gap: 0.5rem;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.months-editor-dialog .dashboard-home-debt-row {
+  display: grid;
+  min-width: 0;
+  min-height: 4.5rem;
+  grid-template-columns: 2.5rem minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--dashboard-border-soft);
+  border-radius: 0.9rem;
+  background: linear-gradient(115deg, oklch(0.14 0.05 265 / 84%), oklch(0.11 0.04 265 / 90%));
+}
+
+.months-editor-dialog .dashboard-home-debt-row:hover {
+  border-color: oklch(0.62 0.16 265 / 42%);
+  background: linear-gradient(115deg, oklch(0.18 0.07 265 / 92%), oklch(0.13 0.045 265 / 94%));
+}
+
+.months-editor-dialog .dashboard-home-debt-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.months-editor-dialog .dashboard-home-debt-actions {
+  gap: 0.25rem;
+}
+
+.months-editor-dialog .dashboard-home-debt-actions button {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.months-editor-dialog .dashboard-debt-list > :not([hidden]) ~ :not([hidden]) {
+  border-color: oklch(0.6 0.06 265 / 12%);
+}
+
+@media (min-width: 1024px) {
+  .months-summary-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .months-summary-card {
+    min-height: 5.5rem;
+    padding-inline: 1.1rem;
+  }
+}
+
+@media (max-width: 639px) {
+  .months-editor-debts {
+    padding: 0.75rem;
+  }
+
+  .months-editor-debts-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .months-editor-dialog .dashboard-home-debt-row {
+    grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    gap: 0.4rem 0.625rem;
+    padding: 0.65rem 0.7rem;
+  }
+
+  .months-editor-dialog .dashboard-home-debt-icon {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .months-editor-dialog .dashboard-home-debt-main {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .months-editor-dialog .dashboard-home-debt-amount {
+    grid-column: 3;
+    grid-row: 1;
+    font-size: 0.8rem;
+  }
+
+  .months-editor-dialog .dashboard-home-debt-actions {
+    grid-column: 2 / 4;
+    grid-row: 2;
+    justify-self: end;
   }
 }
 

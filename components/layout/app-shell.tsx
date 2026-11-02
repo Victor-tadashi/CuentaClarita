@@ -7,6 +7,9 @@ import { LayoutDashboard, CalendarDays, History, LogOut, UserCircle, TrendingUp 
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/features/auth/auth-provider'
 
+const BRAND_LOGO_SOURCE =
+  'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-XUwifLPZtEvuZb9Je24sPWWvNDCHO9.png'
+
 const NAV_ITEMS = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/meses', label: 'Administrar Meses', icon: CalendarDays },
@@ -24,7 +27,7 @@ function Brand({ dashboard = false }: { dashboard?: boolean }) {
       <Link href="/" className="dashboard-home-brand" aria-label="CuentaClarita, ir al inicio">
         <span className="dashboard-home-brand-mark" aria-hidden="true">
           <Image
-            src="/brand/cuenta-clarita.png"
+            src={BRAND_LOGO_SOURCE}
             alt=""
             width={193}
             height={129}
@@ -56,6 +59,7 @@ function Brand({ dashboard = false }: { dashboard?: boolean }) {
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const isDashboard = pathname === '/'
+  const useCompactBrand = isDashboard || pathname.startsWith('/meses')
   const { user, loaded, signOut } = useAuth()
 
   if (pathname.startsWith('/login') || pathname.startsWith('/registro')) {
@@ -69,7 +73,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Sidebar — escritorio */}
       <aside className="dashboard-sidebar sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r px-4 py-5 md:flex">
         <div className="dashboard-brand-frame px-2">
-          <Brand dashboard={isDashboard} />
+          <Brand dashboard={useCompactBrand} />
         </div>
         <nav className="mt-8 flex flex-col gap-1">
           {NAV_ITEMS.map((item) => {
@@ -134,7 +138,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Encabezado — móvil */}
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/80 px-4 backdrop-blur-md md:hidden">
-        <Brand dashboard={isDashboard} />
+        <Brand dashboard={useCompactBrand} />
         <button
           type="button"
           onClick={signOut}
