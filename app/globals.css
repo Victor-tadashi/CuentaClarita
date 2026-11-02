@@ -95,7 +95,6 @@
   --login-background-deep: #0b1020;
   --login-panel: oklch(0.18 0.045 270 / 82%);
   --login-input-background: oklch(0.22 0.04 270 / 72%);
-  --login-logo-background: oklch(0.98 0.005 270);
   --login-accent: oklch(0.72 0.2 285);
   --login-border: oklch(0.7 0.16 275 / 38%);
   --login-border-strong: oklch(0.68 0.08 270 / 34%);
@@ -155,9 +154,24 @@
   box-shadow: inset 0 1px 0 oklch(1 0 0 / 5%), 0 0.75rem 1.5rem oklch(0.02 0.04 265 / 20%);
 }
 
-.dashboard-brand-image {
-  background: oklch(0.93 0.012 270);
-  box-shadow: 0 0.5rem 1rem oklch(0.02 0.04 265 / 24%);
+.brand-logo-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.dashboard-brand-link {
+  display: flex;
+  width: min(10rem, 100%);
+  min-width: 0;
+  align-items: center;
+}
+
+@media (max-width: 767px) {
+  .dashboard-brand-link {
+    width: min(9rem, 100%);
+  }
 }
 
 .dashboard-nav-item {
@@ -1060,48 +1074,6 @@
   background: linear-gradient(145deg, oklch(0.15 0.05 265 / 92%), oklch(0.1 0.035 265 / 84%));
 }
 
-.dashboard-home-brand {
-  display: flex;
-  min-width: 0;
-  align-items: center;
-  gap: 0.625rem;
-  color: var(--foreground);
-}
-
-.dashboard-home-brand-mark {
-  position: relative;
-  display: block;
-  width: 2.75rem;
-  height: 2.75rem;
-  flex: none;
-  overflow: hidden;
-  border: 1px solid oklch(0.7 0.08 265 / 24%);
-  border-radius: 0.85rem;
-  background: #f8faff;
-  box-shadow: 0 0.4rem 1rem oklch(0.02 0.04 265 / 24%);
-}
-
-.dashboard-home-brand-crop {
-  position: absolute;
-  top: -2.6875rem;
-  left: -8.86rem;
-  width: 12.07rem;
-  max-width: none;
-  height: 8.05rem;
-  object-fit: fill;
-}
-
-.dashboard-home-brand-name {
-  color: var(--foreground);
-  font-size: 0.98rem;
-  font-weight: 700;
-  letter-spacing: -0.04em;
-  white-space: nowrap;
-}
-
-.dashboard-home-brand-name span {
-  color: var(--primary);
-}
 
 .dashboard-home-shell .dashboard-main {
   padding: 1.5rem 1rem calc(6rem + env(safe-area-inset-bottom));
@@ -1713,44 +1685,9 @@
 
 .login-brand {
   display: inline-flex;
+  width: min(11.5rem, 48vw);
   min-width: 0;
   align-items: center;
-  gap: 0.75rem;
-}
-
-.login-brand-mark {
-  position: relative;
-  display: block;
-  width: 2.5rem;
-  height: 2.5rem;
-  flex: 0 0 2.5rem;
-  overflow: hidden;
-  border: 1px solid rgb(167 139 250 / 42%);
-  border-radius: 0.8rem;
-  background: #f4f5ff;
-  box-shadow: 0 0.45rem 1.1rem rgb(99 86 213 / 24%);
-}
-
-.login-brand-mark-image {
-  position: absolute;
-  top: -3.1rem;
-  left: -9.85rem;
-  width: 13.1rem;
-  max-width: none;
-  height: auto;
-}
-
-.login-brand-name {
-  color: #f4f5ff;
-  font-size: 1.35rem;
-  font-weight: 750;
-  letter-spacing: -0.065em;
-  line-height: 1;
-  white-space: nowrap;
-}
-
-.login-brand-name span {
-  color: #b49aff;
 }
 
 .login-topbar-note {
@@ -2325,17 +2262,7 @@
   }
 
   .login-brand {
-    gap: 0.65rem;
-  }
-
-  .login-brand-mark {
-    width: 2.4rem;
-    height: 2.4rem;
-    flex-basis: 2.4rem;
-  }
-
-  .login-brand-name {
-    font-size: 1.25rem;
+    width: min(9rem, 45vw);
   }
 
   .login-layout {
