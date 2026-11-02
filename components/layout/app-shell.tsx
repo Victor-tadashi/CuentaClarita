@@ -7,8 +7,7 @@ import { LayoutDashboard, CalendarDays, History, LogOut, UserCircle, TrendingUp 
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/features/auth/auth-provider'
 
-const BRAND_LOGO_SOURCE =
-  'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-XUwifLPZtEvuZb9Je24sPWWvNDCHO9.png'
+const BRAND_LOGO_SOURCE = '/brand/cuenta-clarita.png'
 
 const NAV_ITEMS = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -21,35 +20,20 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`)
 }
 
-function Brand({ dashboard = false }: { dashboard?: boolean }) {
-  if (dashboard) {
-    return (
-      <Link href="/" className="dashboard-home-brand" aria-label="CuentaClarita, ir al inicio">
-        <span className="dashboard-home-brand-mark" aria-hidden="true">
-          <Image
-            src={BRAND_LOGO_SOURCE}
-            alt=""
-            width={193}
-            height={129}
-            className="dashboard-home-brand-crop"
-            priority
-          />
-        </span>
-        <span className="dashboard-home-brand-name">
-          Cuenta<span>Clarita</span>
-        </span>
-      </Link>
-    )
-  }
-
+function Brand() {
   return (
-    <Link href="/" className="flex items-center" aria-label="CuentaClarita, ir al inicio">
+    <Link
+      href="/"
+      className="dashboard-brand-link"
+      aria-label="CuentaClarita, ir al inicio"
+    >
       <Image
-        src="/brand/cuenta-clarita.png"
-        alt="CuentaClarita — tus finanzas, siempre claras"
-        width={220}
-        height={92}
-        className="dashboard-brand-image h-11 w-[10.5rem] rounded-md object-contain p-0.5"
+        src={BRAND_LOGO_SOURCE}
+        alt=""
+        width={1600}
+        height={533}
+        sizes="(max-width: 767px) 9rem, 10rem"
+        className="brand-logo-image"
         priority
       />
     </Link>
@@ -59,7 +43,6 @@ function Brand({ dashboard = false }: { dashboard?: boolean }) {
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const isDashboard = pathname === '/'
-  const useCompactBrand = isDashboard || pathname.startsWith('/meses')
   const { user, loaded, signOut } = useAuth()
 
   if (pathname.startsWith('/login') || pathname.startsWith('/registro')) {
@@ -73,7 +56,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Sidebar — escritorio */}
       <aside className="dashboard-sidebar sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r px-4 py-5 md:flex">
         <div className="dashboard-brand-frame px-2">
-          <Brand dashboard={useCompactBrand} />
+          <Brand />
         </div>
         <nav className="mt-8 flex flex-col gap-1">
           {NAV_ITEMS.map((item) => {
@@ -138,7 +121,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Encabezado — móvil */}
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/80 px-4 backdrop-blur-md md:hidden">
-        <Brand dashboard={useCompactBrand} />
+        <Brand />
         <button
           type="button"
           onClick={signOut}

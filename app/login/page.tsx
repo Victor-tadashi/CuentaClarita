@@ -97,19 +97,15 @@ export default function LoginPage() {
       <div className="login-shell">
         <header className="login-topbar">
           <div className="login-brand">
-            <span className="login-brand-mark" aria-hidden="true">
-              <Image
-                src="/brand/cuenta-clarita.png"
-                alt=""
-                width={1536}
-                height={1024}
-                className="login-brand-mark-image"
-                priority
-              />
-            </span>
-            <span className="login-brand-name">
-              Cuenta<span>Clarita</span>
-            </span>
+            <Image
+              src="/brand/cuenta-clarita.png"
+              alt="CuentaClarita"
+              width={1600}
+              height={533}
+              sizes="(max-width: 639px) 45vw, 11.5rem"
+              className="brand-logo-image"
+              priority
+            />
           </div>
           <span className="login-topbar-note">Tus finanzas, más simples</span>
         </header>
