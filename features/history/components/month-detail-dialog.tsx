@@ -29,7 +29,7 @@ export function MonthDetailDialog({
 
   return (
     <Dialog open={month !== null} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="history-detail-dialog sm:max-w-xl">
         {month ? (
           <>
             <DialogHeader>
@@ -37,12 +37,12 @@ export function MonthDetailDialog({
               <DialogDescription>Resumen de solo lectura.</DialogDescription>
             </DialogHeader>
 
-            <div className="grid grid-cols-3 gap-2">
-              <div className="modal-summary-card rounded-xl p-3">
+            <div className="history-dialog-summary-grid grid grid-cols-1 gap-2 sm:grid-cols-3">
+              <div className="modal-summary-card history-dialog-summary-card rounded-xl p-3">
                 <p className="text-xs text-muted-foreground">Sueldo</p>
                 <Amount value={summary.salary} className="text-sm font-medium" />
               </div>
-              <div className="modal-summary-card rounded-xl p-3">
+              <div className="modal-summary-card history-dialog-summary-card rounded-xl p-3">
                 <p className="text-xs text-muted-foreground">Deudas</p>
                 <Amount
                   value={summary.totalDebts}
@@ -50,7 +50,7 @@ export function MonthDetailDialog({
                   className="text-sm font-medium"
                 />
               </div>
-              <div className="rounded-xl bg-primary/10 p-3">
+              <div className="history-dialog-summary-card history-dialog-available-card rounded-xl p-3">
                 <p className="text-xs text-muted-foreground">Disponible</p>
                 <Amount
                   value={summary.available}
@@ -69,7 +69,7 @@ export function MonthDetailDialog({
                   Este mes no tiene deudas registradas.
                 </p>
               ) : (
-                <div className="modal-debt-scroll max-h-64 overflow-y-auto">
+                <div className="modal-debt-scroll history-dialog-debt-scroll max-h-64 overflow-y-auto">
                   <DebtList debts={debts} />
                 </div>
               )}
