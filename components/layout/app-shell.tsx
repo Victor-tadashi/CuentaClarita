@@ -45,7 +45,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const isDashboard = pathname === '/'
   const { user, loaded, signOut } = useAuth()
 
-  if (pathname.startsWith('/login') || pathname.startsWith('/registro')) {
+  if (pathname.startsWith('/login') || pathname.startsWith('/registro') || pathname === '/recuperar-contrasena' || pathname.startsWith('/recuperar-contrasena/')) {
     return <>{children}</>
   }
 

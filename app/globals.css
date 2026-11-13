@@ -2113,6 +2113,56 @@
   outline-offset: 3px;
 }
 
+.login-signup a,
+.login-forgot-password a {
+  color: #b69bff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.login-signup a:hover,
+.login-forgot-password a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.login-signup a:focus-visible,
+.login-forgot-password a:focus-visible {
+  border-radius: 0.2rem;
+  outline: 2px solid #a78bfa;
+  outline-offset: 3px;
+}
+
+.login-forgot-password {
+  margin: 0.1rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  text-align: right;
+}
+
+.recovery-primary-link {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  border-radius: 0.75rem;
+  padding: 0 1rem;
+  color: #f4f5ff;
+  text-decoration: none;
+}
+
+.recovery-primary-link:focus-visible {
+  outline: 2px solid #c4b5fd;
+  outline-offset: 3px;
+}
+
+.recovery-success-icon {
+  border-color: rgb(52 211 153 / 30%);
+  background: rgb(6 78 59 / 24%);
+  color: #34d399;
+}
+
 .login-security-note {
   display: flex;
   max-width: 28.125rem;
@@ -2322,6 +2372,14 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }
+}
+
+.login-page.recovery-page {
+  overflow-y: visible;
+}
+
+.login-page.recovery-page .login-orb {
+  position: fixed;
 }
 
 .months-summary-grid {
