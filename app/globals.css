@@ -2376,6 +2376,11 @@
 
 .login-page.recovery-page {
   overflow-y: visible;
+  min-height: 100dvh;
+}
+
+.login-page.recovery-page .login-shell {
+  min-height: 100dvh;
 }
 
 .login-page.recovery-page .login-orb {
