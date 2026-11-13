@@ -7,19 +7,39 @@ import { createClient } from '@/lib/supabase/client'
 import { IdleSessionGuard } from './idle-session-guard'
 
 type SessionUser = { id: string; name: string; email: string }
-type AuthContextValue = { user: SessionUser | null; loaded: boolean; recoveryAuthorized: boolean; signIn: (email: string, password: string) => Promise<{ ok: boolean; message?: string }>; signUp: (name: string, email: string, password: string) => Promise<{ ok: boolean; message?: string }>; signOut: () => Promise<void> }
+type AuthContextValue = {
+  user: SessionUser | null
+  sessionId: string | null
+  loaded: boolean
+  signIn: (email: string, password: string) => Promise<{ ok: boolean; message?: string }>
+  signUp: (name: string, email: string, password: string) => Promise<{ ok: boolean; message?: string }>
+  signOut: () => Promise<void>
+}
 const AuthContext = React.createContext<AuthContextValue | null>(null)
 
 function mapUser(user: { id: string; email?: string; user_metadata?: { display_name?: string } }): SessionUser {
   return { id: user.id, email: user.email ?? '', name: user.user_metadata?.display_name || user.email?.split('@')[0] || 'Usuario' }
 }
 
+function getSessionId(session: Session | null) {
+  const encodedPayload = session?.access_token.split('.')[1]
+  if (!encodedPayload) return null
+
+  try {
+    const base64 = encodedPayload.replace(/-/g, '+').replace(/_/g, '/')
+    const paddedBase64 = base64.padEnd(Math.ceil(base64.length / 4) * 4, '=')
+    const claims = JSON.parse(window.atob(paddedBase64)) as { session_id?: unknown }
+    return typeof claims.session_id === 'string' ? claims.session_id : null
+  } catch {
+    return null
+  }
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter(); const pathname = usePathname()
   const supabase = React.useMemo(() => typeof window === 'undefined' ? null : createClient(), [])
   const [user, setUser] = React.useState<SessionUser | null>(null); const [loaded, setLoaded] = React.useState(false)
-  const [recoveryUserId, setRecoveryUserId] = React.useState<string | null>(null)
-  const recoveryUserIdRef = React.useRef<string | null>(null)
+  const [sessionId, setSessionId] = React.useState<string | null>(null)
   const invalidSessionHandled = React.useRef(false)
 
   React.useEffect(() => {
@@ -38,18 +58,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    const clearRecoveryAuthorization = () => {
-      recoveryUserIdRef.current = null
-      setRecoveryUserId(null)
-    }
-
     const handleInvalidSession = () => {
       if (invalidSessionHandled.current) return
       invalidSessionHandled.current = true
       setUser(null)
-      clearRecoveryAuthorization()
+      setSessionId(null)
       clearLocalSupabaseStorage()
       void supabase.auth.signOut({ scope: 'local' }).catch(() => undefined)
+      void fetch('/api/auth/recovery', { method: 'DELETE', cache: 'no-store' }).catch(() => undefined)
     }
 
     const { data } = supabase.auth.onAuthStateChange((event: AuthChangeEvent, session: Session | null) => {
@@ -58,24 +74,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return
       }
 
-      if (event === 'PASSWORD_RECOVERY' && session?.user) {
-        recoveryUserIdRef.current = session.user.id
-        setRecoveryUserId(session.user.id)
-      } else if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || !session) {
-        recoveryUserIdRef.current = null
-        setRecoveryUserId(null)
-      }
-
+      setSessionId(getSessionId(session))
       setUser(session?.user ? mapUser(session.user) : null)
     })
 
     supabase.auth.getSession().then(({ data: sessionData, error }: { data: { session: Session | null }; error: { code?: string; message?: string } | null }) => {
       if (isInvalidRefreshToken(error)) handleInvalidSession()
-      else setUser(sessionData.session?.user ? mapUser(sessionData.session.user) : null)
+      else {
+        setSessionId(getSessionId(sessionData.session))
+        setUser(sessionData.session?.user ? mapUser(sessionData.session.user) : null)
+      }
       setLoaded(true)
     }).catch((error: unknown) => {
       if (isInvalidRefreshToken(error)) handleInvalidSession()
-      else setUser(null)
+      else {
+        setSessionId(null)
+        setUser(null)
+      }
       setLoaded(true)
     })
 
@@ -84,15 +99,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     if (!loaded) return
     const recoveryRoute = pathname === '/recuperar-contrasena' || pathname.startsWith('/recuperar-contrasena/')
-    const publicRoute = pathname.startsWith('/login') || pathname.startsWith('/registro') || recoveryRoute
+    const confirmationRoute = pathname.startsWith('/auth/confirm')
+    const publicRoute = pathname.startsWith('/login') || pathname.startsWith('/registro') || recoveryRoute || confirmationRoute
     const loginRoute = pathname.startsWith('/login')
     if (!user && !publicRoute) router.replace('/login')
     if (user && loginRoute) router.replace('/')
   }, [loaded, pathname, router, user])
   const value = React.useMemo<AuthContextValue>(() => ({
     user,
+    sessionId,
     loaded,
-    recoveryAuthorized: Boolean(user && recoveryUserId === user.id),
     async signIn(email, password) {
       if (!supabase) return { ok: false, message: 'El servicio de autenticación no está disponible.' }
       try {
@@ -132,18 +148,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } catch {
         setUser(null)
       } finally {
-        recoveryUserIdRef.current = null
-        setRecoveryUserId(null)
+        await fetch('/api/auth/recovery', { method: 'DELETE', cache: 'no-store' }).catch(() => undefined)
+        setSessionId(null)
         setUser(null)
         router.replace('/login')
       }
     },
-  }), [loaded, recoveryUserId, router, supabase, user])
+  }), [loaded, router, sessionId, supabase, user])
   return (
     <AuthContext.Provider value={value}>
       {children}
       <IdleSessionGuard
-        enabled={loaded && Boolean(user) && !pathname.startsWith('/login') && !pathname.startsWith('/registro') && pathname !== '/recuperar-contrasena' && !pathname.startsWith('/recuperar-contrasena/')}
+        enabled={loaded && Boolean(user) && !pathname.startsWith('/login') && !pathname.startsWith('/registro') && !pathname.startsWith('/auth/confirm') && pathname !== '/recuperar-contrasena' && !pathname.startsWith('/recuperar-contrasena/')}
         userId={user?.id ?? null}
         onSignOut={value.signOut}
       />

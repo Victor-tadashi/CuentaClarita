@@ -141,7 +141,7 @@ export function PasswordRecoveryRequest() {
       const callbackUrl = new URL(
         process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/auth/callback`,
       )
-      callbackUrl.searchParams.set('next', RECOVERY_PASSWORD_PATH)
+      callbackUrl.searchParams.set('next', '/auth/confirm')
 
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
         redirectTo: callbackUrl.toString(),
@@ -271,8 +271,10 @@ function PasswordField({
   )
 }
 
-export function PasswordRecoveryUpdate() {
-  const { loaded, recoveryAuthorized } = useAuth()
+type RecoveryGrantForForm = { userId: string; sessionId: string; expiresAt: number } | null
+
+export function PasswordRecoveryUpdate({ recoveryGrant }: { recoveryGrant: RecoveryGrantForForm }) {
+  const { loaded, user, sessionId } = useAuth()
   const [password, setPassword] = React.useState('')
   const [confirmation, setConfirmation] = React.useState('')
   const [showPassword, setShowPassword] = React.useState(false)
@@ -280,7 +282,32 @@ export function PasswordRecoveryUpdate() {
   const [error, setError] = React.useState('')
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [isComplete, setIsComplete] = React.useState(false)
+  const [expiredGrantKey, setExpiredGrantKey] = React.useState<string | null>(null)
   const submittingRef = React.useRef(false)
+  const recoveryGrantKey = recoveryGrant
+    ? `${recoveryGrant.userId}:${recoveryGrant.sessionId}:${recoveryGrant.expiresAt}`
+    : null
+
+  React.useEffect(() => {
+    if (!recoveryGrant || !recoveryGrantKey) return
+
+    const remaining = recoveryGrant.expiresAt - Date.now()
+    if (remaining <= 0) {
+      setExpiredGrantKey(recoveryGrantKey)
+      return
+    }
+
+    const timeout = window.setTimeout(() => setExpiredGrantKey(recoveryGrantKey), remaining)
+    return () => window.clearTimeout(timeout)
+  }, [recoveryGrant, recoveryGrantKey])
+
+  const recoveryAuthorized = Boolean(
+    loaded &&
+    recoveryGrantKey !== expiredGrantKey &&
+    recoveryGrant &&
+    user?.id === recoveryGrant.userId &&
+    sessionId === recoveryGrant.sessionId,
+  )
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -300,12 +327,18 @@ export function PasswordRecoveryUpdate() {
     setIsSubmitting(true)
 
     try {
-      const supabase = createClient()
-      const { error: updateError } = await supabase.auth.updateUser({ password })
-      if (updateError) {
-        if (updateError.code === 'weak_password') {
+      const response = await fetch('/api/auth/recovery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+        cache: 'no-store',
+      })
+      const result = await response.json().catch(() => null)
+
+      if (!response.ok || !result?.ok) {
+        if (result?.code === 'weak_password') {
           setError('La contraseña no cumple los requisitos de seguridad configurados. Elige otra e inténtalo nuevamente.')
-        } else if (updateError.status === 429) {
+        } else if (response.status === 429) {
           setError('Se alcanzó el límite de intentos. Espera un momento antes de intentarlo de nuevo.')
         } else {
           setError('El enlace de recuperación ya no es válido. Solicita uno nuevo para continuar.')
@@ -314,7 +347,7 @@ export function PasswordRecoveryUpdate() {
       }
 
       setIsComplete(true)
-      await supabase.auth.signOut({ scope: 'local' })
+      await createClient().auth.signOut({ scope: 'local' })
     } catch {
       setError('No pudimos completar la solicitud. Solicita un enlace nuevo e inténtalo otra vez.')
     } finally {
