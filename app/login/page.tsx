@@ -168,6 +168,11 @@ export default function LoginPage() {
                       {showPassword ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
                     </button>
                   </div>
+                  {!registering && (
+                    <p className="login-forgot-password">
+                      <Link href="/recuperar-contrasena">¿Olvidaste tu contraseña?</Link>
+                    </p>
+                  )}
                 </div>
                 {error && <p className="login-message login-error" role="alert">{error}</p>}
                 {success && <p className="login-message login-success" role="status">{success}</p>}
