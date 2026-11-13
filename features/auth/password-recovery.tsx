@@ -212,7 +212,7 @@ export function PasswordRecoveryRequest() {
 
         {error && <p className="login-message login-error" id="recovery-email-error" role="alert">{error}</p>}
 
-        <Button type="submit" size="lg" className="login-submit mt-2 h-14 w-full rounded-xl text-base font-semibold" disabled={isSubmitting}>
+        <Button type="submit" size="lg" className="login-submit recovery-send-button mt-2 h-14 w-full rounded-xl text-base font-semibold" disabled={isSubmitting}>
           {isSubmitting
             ? <LoaderCircle className="size-5 animate-spin" aria-hidden="true" />
             : <Send className="size-5" aria-hidden="true" />}

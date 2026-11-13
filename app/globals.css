@@ -2053,6 +2053,26 @@
   transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
 }
 
+.login-submit.recovery-send-button {
+  white-space: normal;
+}
+
+.login-submit.recovery-send-button > span {
+  min-width: 0;
+  line-height: 1.25;
+  white-space: normal;
+}
+
+@media (max-width: 359px) {
+  .login-submit.recovery-send-button {
+    height: auto;
+    min-height: 3.5rem;
+    gap: 0.5rem;
+    padding-block: 0.65rem;
+    padding-inline: 0.75rem;
+  }
+}
+
 .login-submit:hover:not(:disabled) {
   filter: brightness(1.08);
   transform: translateY(-1px);
